@@ -1,36 +1,125 @@
-import NextAuth from "next-auth";
-import { Role } from "@prisma/client";
-import authConfig from "@/auth.config";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { isAdminEmail, isDauEmail, normalizeEmail } from "@/lib/validation";
+import { isAdminEmail, normalizeEmail } from "@/lib/validation";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  ...authConfig,
-  session: { strategy: "jwt" },
-  callbacks: {
-    ...authConfig.callbacks,
-    async signIn({ account, profile }) {
-      // Mandatory server-side domain check: the `hd` param alone can be bypassed.
-      if (account?.provider !== "google" || !profile?.email || !profile.email_verified) return false;
-      const email = normalizeEmail(profile.email);
-      if (!isDauEmail(email)) return false;
+export type SessionUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: "admin" | "participant";
+};
 
-      const fallbackName = profile.name ?? email;
-      const role = isAdminEmail(email) ? Role.admin : Role.participant;
-      const user = await prisma.user.upsert({
+export type Session = {
+  user: SessionUser;
+};
+
+/**
+ * Returns the currently authenticated user's session from Supabase SSR cookies,
+ * enriched with their role and profile data from the database.
+ */
+export async function auth(): Promise<Session | null> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !user.email) {
+      return null;
+    }
+
+    const email = normalizeEmail(user.email);
+    const role = isAdminEmail(email) ? "admin" : "participant";
+
+    // Attempt to read customized human name from Prisma User
+    let name: string | null = null;
+    let userId = user.id;
+
+    try {
+      const dbUser = await prisma.user.findUnique({
         where: { email },
-        update: { role },
-        create: { email, name: fallbackName, role },
+        select: { id: true, name: true, role: true },
       });
+      if (dbUser) {
+        name = dbUser.name;
+        userId = dbUser.id;
+      }
+    } catch {
+      // Prisma read fallback
+    }
 
-      // If a leader already added this person to a team, link their account.
-      // We do NOT overwrite the leader's typed name because Google accounts at DAU
-      // often have roll numbers/IDs as display names instead of actual human names.
-      await prisma.teamMember.updateMany({
-        where: { email, userId: null },
-        data: { userId: user.id },
-      });
-      return true;
+    if (!name) {
+      name =
+        user.user_metadata?.full_name ??
+        user.user_metadata?.name ??
+        email;
+    }
+
+    return {
+      user: {
+        id: userId,
+        email,
+        name,
+        role,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Initiates Supabase Google OAuth sign-in.
+ */
+export async function signIn(
+  _provider: string = "google",
+  options?: { redirectTo?: string }
+) {
+  const supabase = await createClient();
+  const headerStore = await headers();
+  const host =
+    headerStore.get("x-forwarded-host") ||
+    headerStore.get("host") ||
+    "localhost:3000";
+  const proto =
+    headerStore.get("x-forwarded-proto") ||
+    (host.includes("localhost") ? "http" : "https");
+  const origin = `${proto}://${host}`;
+  const next = options?.redirectTo || "/dashboard";
+  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo,
+      queryParams: {
+        hd: "dau.ac.in",
+        prompt: "select_account",
+      },
     },
-  },
-});
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (data?.url) {
+    redirect(data.url);
+  }
+}
+
+/**
+ * Signs out the current user and clears Supabase session cookies.
+ */
+export async function signOut(options?: { redirectTo?: string }) {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect(options?.redirectTo || "/login");
+}
+
+export const handlers = {
+  GET: async () => new Response("Supabase Auth Active"),
+  POST: async () => new Response("Supabase Auth Active"),
+};
