@@ -50,17 +50,6 @@ export function DashboardHeader({ user, whatsappUrl }: DashboardHeaderProps) {
             </a>
           )}
 
-          {/* Admin link */}
-          {user.role === "admin" && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-mono font-medium text-purple-300 hover:bg-purple-500/20 transition-all"
-            >
-              <Shield className="h-3.5 w-3.5 text-purple-400" />
-              <span className="hidden sm:inline">Admin</span>
-            </Link>
-          )}
-
           {/* User email badge */}
           <div className="hidden sm:flex flex-col text-right">
             <span className="text-xs font-medium text-white truncate max-w-[150px]">

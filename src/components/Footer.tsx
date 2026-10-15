@@ -19,12 +19,9 @@ export function Footer() {
         </div>
 
         <div className="flex items-center gap-6 text-xs text-slate-400 font-mono">
-          <Link href="/showcase" className="hover:text-cyan-400 transition-colors">
-            Showcase
-          </Link>
-          <a href="/api-blitz-spec.pdf" target="_blank" className="hover:text-cyan-400 transition-colors">
+          <Link href="/rulebook" className="hover:text-cyan-400 transition-colors">
             Rulebook
-          </a>
+          </Link>
           <Link href="/login" className="hover:text-cyan-400 transition-colors">
             Sign In
           </Link>

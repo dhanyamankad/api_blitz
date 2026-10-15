@@ -28,7 +28,7 @@ export function EventOverview({ rulebookUrl }: EventOverviewProps) {
     {
       icon: GitBranch,
       tag: "EXECUTION",
-      title: "24-Hour Sprint",
+      title: "6-Hour Sprint",
       desc: "Integrate, architect, and ship your solution. Collaborate on GitHub and polish your submission before the clock strikes zero.",
       color: "from-sky-500/20 to-cyan-500/10",
       border: "border-sky-500/30",
@@ -118,14 +118,13 @@ export function EventOverview({ rulebookUrl }: EventOverviewProps) {
           </div>
 
           <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
-            <a
-              href={rulebookUrl || "/api-blitz-spec.pdf"}
-              download="API-Blitz-Rulebook.pdf"
+            <Link
+              href="/rulebook"
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 px-5 py-2.5 text-xs font-mono font-semibold text-white transition-all"
             >
-              <Download className="h-4 w-4 text-cyan-400" />
-              Download PDF
-            </a>
+              <FileText className="h-4 w-4 text-cyan-400" />
+              View Rulebook
+            </Link>
             <Link
               href="/login"
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-xs font-mono font-bold text-slate-950 hover:brightness-110 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all"

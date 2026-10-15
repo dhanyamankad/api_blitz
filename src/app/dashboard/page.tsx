@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getSettings, eventPhase } from "@/lib/settings";
+import { getSettings, eventPhase, areSubmissionsOpen } from "@/lib/settings";
 import { normalizeEmail } from "@/lib/validation";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { RegistrationForm } from "@/components/dashboard/RegistrationForm";
@@ -15,6 +15,11 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.email) {
     redirect("/login");
+  }
+
+  // Admin users are directly redirected to /admin and no dashboard is shown
+  if (session.user.role === "admin") {
+    redirect("/admin");
   }
 
   const email = normalizeEmail(session.user.email);
@@ -38,6 +43,7 @@ export default async function DashboardPage() {
   ]);
 
   const phase = eventPhase(s);
+  const isSubmissionsOpen = areSubmissionsOpen(s);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#030712] text-slate-100">
@@ -77,6 +83,7 @@ export default async function DashboardPage() {
             submissionDeadline={s.submissionDeadline}
             rulebookUrl={s.rulebookUrl}
             phase={phase}
+            isSubmissionsOpen={isSubmissionsOpen}
           />
         )}
 

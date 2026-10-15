@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { submitGithubAction, ActionState } from "@/app/dashboard/actions";
+import Link from "next/link";
 import {
   CheckCircle2,
   Lock,
@@ -13,6 +14,8 @@ import {
   Clock,
   Code2,
   Users,
+  Video,
+  Zap,
 } from "lucide-react";
 
 interface ApiData {
@@ -37,6 +40,7 @@ interface ApprovedDashboardProps {
     assignments: { api: ApiData }[];
     submission: {
       githubUrl: string;
+      youtubeUrl?: string | null;
       submittedAt: Date;
       updatedAt: Date;
     } | null;
@@ -45,6 +49,7 @@ interface ApprovedDashboardProps {
   submissionDeadline: Date | null;
   rulebookUrl?: string;
   phase: "before_start" | "live" | "ended";
+  isSubmissionsOpen?: boolean;
 }
 
 export function ApprovedDashboard({
@@ -53,6 +58,7 @@ export function ApprovedDashboard({
   submissionDeadline,
   rulebookUrl,
   phase,
+  isSubmissionsOpen = false,
 }: ApprovedDashboardProps) {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     submitGithubAction,
@@ -60,7 +66,7 @@ export function ApprovedDashboard({
   );
 
   const hasSubmitted = !!team.submission;
-  const isSubmissionLocked = phase === "ended";
+  const isSubmissionLocked = !isSubmissionsOpen;
   const isApiLocked = phase === "before_start";
 
   // Progress Steps calculation
@@ -76,9 +82,15 @@ export function ApprovedDashboard({
       <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-medium text-emerald-400 mb-2">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>SQUAD APPROVED</span>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-medium text-emerald-400">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>SQUAD APPROVED</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-mono font-medium text-sky-400">
+                <Zap className="h-3.5 w-3.5" />
+                <span>6 HOUR SPRINT</span>
+              </span>
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight">
               {team.name}
@@ -86,16 +98,13 @@ export function ApprovedDashboard({
           </div>
 
           <div className="flex items-center gap-3">
-            <a
-              href={rulebookUrl || "/api-blitz-spec.pdf"}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/rulebook"
               className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-mono font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
             >
               <FileText className="h-3.5 w-3.5" />
               <span>Rulebook</span>
-              <ExternalLink className="h-3 w-3 text-slate-500" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -234,11 +243,22 @@ export function ApprovedDashboard({
             </h2>
           </div>
           <span
-            className={`text-xs font-mono ${
-              isSubmissionLocked ? "text-red-400" : "text-emerald-400"
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium ${
+              !isSubmissionLocked
+                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : phase === "ended"
+                ? "border border-red-500/30 bg-red-500/10 text-red-400"
+                : "border border-amber-500/30 bg-amber-500/10 text-amber-400"
             }`}
           >
-            {isSubmissionLocked ? "DEADLINE LOCKED" : "SUBMISSIONS ACTIVE"}
+            <Lock className="h-3 w-3" />
+            <span>
+              {!isSubmissionLocked
+                ? "SUBMISSIONS ACTIVE"
+                : phase === "ended"
+                ? "DEADLINE LOCKED"
+                : "LOCKED UNTIL UNLOCKED"}
+            </span>
           </span>
         </div>
 
@@ -247,15 +267,30 @@ export function ApprovedDashboard({
           <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950/60 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
             <div>
               <div className="text-[10px] text-slate-400 uppercase">Current Submission</div>
-              <a
-                href={team.submission?.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sky-400 hover:underline font-medium text-sm flex items-center gap-1.5 mt-0.5"
-              >
-                <span>{team.submission?.githubUrl}</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
+              <div className="space-y-1.5 mt-1">
+                <a
+                  href={team.submission?.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-400 hover:underline font-medium text-sm flex items-center gap-1.5"
+                >
+                  <GitBranch className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{team.submission?.githubUrl}</span>
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                </a>
+                {team.submission?.youtubeUrl && (
+                  <a
+                    href={team.submission.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-red-400 hover:underline font-medium text-sm flex items-center gap-1.5"
+                  >
+                    <Video className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{team.submission.youtubeUrl}</span>
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                  </a>
+                )}
+              </div>
             </div>
             <div className="text-right text-[10px] text-slate-400">
               <div>Updated: {team.submission?.updatedAt ? new Date(team.submission.updatedAt).toLocaleString("en-IN") : "Recorded"}</div>
@@ -273,7 +308,7 @@ export function ApprovedDashboard({
         {state?.success && (
           <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-3 text-xs font-mono text-emerald-300 flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-            <span>Submission updated successfully! Both teammates can see and edit this link anytime before the deadline.</span>
+            <span>Submission updated successfully! Both teammates can see and edit these links anytime before the deadline.</span>
           </div>
         )}
 
@@ -282,9 +317,10 @@ export function ApprovedDashboard({
             <div>
               <label
                 htmlFor="githubUrl"
-                className="text-xs font-mono font-semibold text-slate-300 block mb-1.5"
+                className="text-xs font-mono font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5"
               >
-                GITHUB REPOSITORY URL *
+                <GitBranch className="h-3.5 w-3.5 text-sky-400" />
+                <span>GITHUB REPOSITORY URL *</span>
               </label>
               <input
                 type="url"
@@ -306,22 +342,61 @@ export function ApprovedDashboard({
               )}
             </div>
 
+            <div>
+              <label
+                htmlFor="youtubeUrl"
+                className="text-xs font-mono font-semibold text-slate-300 block mb-1.5 flex items-center gap-1.5"
+              >
+                <Video className="h-3.5 w-3.5 text-red-400" />
+                <span>YOUTUBE VIDEO DEMO URL *</span>
+              </label>
+              <input
+                type="url"
+                id="youtubeUrl"
+                name="youtubeUrl"
+                defaultValue={team.submission?.youtubeUrl || ""}
+                required
+                placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                className={`w-full rounded-xl border bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-1 ${
+                  state?.fieldErrors?.youtubeUrl
+                    ? "border-red-500/60 focus:border-red-400 focus:ring-red-400"
+                    : "border-slate-800 focus:border-sky-500 focus:ring-sky-500"
+                }`}
+              />
+              {state?.fieldErrors?.youtubeUrl && (
+                <p className="mt-1 text-[11px] font-mono text-red-400">
+                  {state.fieldErrors.youtubeUrl}
+                </p>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={isPending}
               className="rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-500 px-6 py-2.5 text-xs font-mono font-bold text-slate-950 transition-colors"
             >
               {isPending
-                ? "Saving..."
+                ? "Saving Submission..."
                 : hasSubmitted
-                ? "Update Submission Link"
-                : "Submit GitHub Repository"}
+                ? "Update Project Submission"
+                : "Submit Project (GitHub & YouTube)"}
             </button>
           </form>
         ) : (
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs font-mono text-slate-400 flex items-center gap-2.5">
-            <Clock className="h-4 w-4 text-slate-500" />
-            <span>The deadline has passed. Submissions are permanently locked for evaluation.</span>
+          <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-5 text-xs font-mono text-slate-300 space-y-2">
+            <div className="flex items-center gap-2 text-amber-400 font-bold">
+              <Lock className="h-4 w-4" />
+              <span>
+                {phase === "ended"
+                  ? "SUBMISSION WINDOW CLOSED"
+                  : "SUBMISSIONS CURRENTLY LOCKED"}
+              </span>
+            </div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              {phase === "ended"
+                ? "The submission deadline has passed (28 Oct 2026, 2:00 AM IST). Submissions are permanently locked for evaluation."
+                : "Project submissions are currently locked. Organizers will unlock repository & video submissions during the sprint window. Submissions will close on 28th October 2026 at 02:00 AM IST. Prepare your GitHub repository and YouTube demo video in the meantime."}
+            </p>
           </div>
         )}
       </div>

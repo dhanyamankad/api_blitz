@@ -47,43 +47,31 @@ export async function Navbar() {
             Timeline
           </Link>
           <Link
-            href="/showcase"
-            className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            <Users className="h-4 w-4" />
-            Team Showcase
-          </Link>
-          <a
-            href="/api-blitz-spec.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors"
+            href="/rulebook"
+            className="text-sm text-slate-400 hover:text-white transition-colors"
           >
             Rulebook
-            <ExternalLink className="h-3.5 w-3.5 text-slate-500" />
-          </a>
+          </Link>
         </nav>
 
         {/* Action Button */}
         <div className="flex items-center gap-3">
           {session?.user ? (
-            <div className="flex items-center gap-3">
-              {session.user.role === "admin" && (
-                <Link
-                  href="/admin"
-                  className="hidden sm:flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-mono font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                >
-                  <ShieldAlert className="h-3.5 w-3.5 text-slate-400" />
-                  Admin Console
-                </Link>
-              )}
+            session.user.role === "admin" ? (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 rounded-lg bg-purple-500 hover:bg-purple-400 px-4 py-2 text-xs font-mono font-semibold text-slate-950 transition-colors shadow-sm"
+              >
+                <span>Admin Console</span>
+              </Link>
+            ) : (
               <Link
                 href="/dashboard"
                 className="flex items-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 px-4 py-2 text-xs font-mono font-semibold text-slate-950 transition-colors shadow-sm"
               >
-                Go to Dashboard
+                <span>Go to Dashboard</span>
               </Link>
-            </div>
+            )
           ) : (
             <Link
               href="/login"

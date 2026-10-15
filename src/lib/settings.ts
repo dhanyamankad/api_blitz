@@ -7,6 +7,7 @@ export type EventSettings = {
   rulebookUrl: string;
   announcement: string;
   nowOverride: Date | null;
+  submissionsUnlocked: boolean;
 };
 
 const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : null);
@@ -26,6 +27,7 @@ export async function getSettings(): Promise<EventSettings> {
     rulebookUrl: map.rulebook_url ?? "",
     announcement: map.announcement ?? "",
     nowOverride: toDate(map.now_override),
+    submissionsUnlocked: map.submissions_unlocked === "true",
   };
 }
 
@@ -41,6 +43,15 @@ export function eventPhase(s: EventSettings): Phase {
   if (s.eventStartAt && now < s.eventStartAt.getTime()) return "before_start";
   if (s.submissionDeadline && now >= s.submissionDeadline.getTime()) return "ended";
   return "live";
+}
+
+/** Submissions are only open if explicitly unlocked by admin AND deadline has not passed. */
+export function areSubmissionsOpen(s: EventSettings): boolean {
+  const now = siteNow(s).getTime();
+  if (s.submissionDeadline && now >= s.submissionDeadline.getTime()) {
+    return false;
+  }
+  return s.submissionsUnlocked;
 }
 
 export function daysUntil(target: Date | null, s: EventSettings): number | null {

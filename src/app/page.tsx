@@ -51,7 +51,7 @@ export default async function Home() {
             {/* Main Headline */}
             <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1]">
               2 HACKERS. <br className="hidden sm:inline" />
-              <span className="text-sky-400">5 SECRET APIS.</span> 24 HOURS.
+              <span className="text-sky-400">5 SECRET APIS.</span> 6 HOURS.
             </h1>
 
             {/* Subtitle */}

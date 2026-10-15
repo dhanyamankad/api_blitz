@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getSettings, siteNow } from "@/lib/settings";
-import { isDauEmail, isGithubRepoUrl, normalizeEmail } from "@/lib/validation";
+import { getSettings, siteNow, areSubmissionsOpen } from "@/lib/settings";
+import { isDauEmail, isGithubRepoUrl, isYoutubeUrl, normalizeEmail } from "@/lib/validation";
 import { Prisma } from "@prisma/client";
 
 export type ActionState = {
@@ -287,31 +287,49 @@ export async function submitGithubAction(
     return { error: "Only approved teams can submit project repositories." };
   }
 
-  // Server-side deadline lock enforcement
-  const now = siteNow(s).getTime();
-  if (s.submissionDeadline && now >= s.submissionDeadline.getTime()) {
-    return { error: "Submissions are closed. The deadline has passed." };
+  // Server-side submission lock enforcement (admin unlocked + before deadline)
+  if (!areSubmissionsOpen(s)) {
+    const now = siteNow(s).getTime();
+    if (s.submissionDeadline && now >= s.submissionDeadline.getTime()) {
+      return { error: "Submissions are closed. The deadline has passed." };
+    }
+    return {
+      error:
+        "Submissions are currently locked. Organizers will unlock project submissions during the sprint.",
+    };
   }
 
   const githubUrlRaw = (formData.get("githubUrl") as string) || "";
   const githubUrl = githubUrlRaw.trim();
+  const youtubeUrlRaw = (formData.get("youtubeUrl") as string) || "";
+  const youtubeUrl = youtubeUrlRaw.trim();
+
+  const fieldErrors: Record<string, string> = {};
 
   if (!isGithubRepoUrl(githubUrl)) {
-    return {
-      fieldErrors: {
-        githubUrl: "Must be a valid GitHub repository URL (e.g., https://github.com/owner/repo)",
-      },
-    };
+    fieldErrors.githubUrl =
+      "Must be a valid GitHub repository URL (e.g., https://github.com/owner/repo)";
+  }
+
+  if (!isYoutubeUrl(youtubeUrl)) {
+    fieldErrors.youtubeUrl =
+      "Must be a valid YouTube video link (e.g., https://youtu.be/... or https://youtube.com/watch?v=...)";
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return { fieldErrors };
   }
 
   try {
     await prisma.submission.upsert({
       where: { teamId: membership.teamId },
-      update: { githubUrl },
-      create: { teamId: membership.teamId, githubUrl },
+      update: { githubUrl, youtubeUrl },
+      create: { teamId: membership.teamId, githubUrl, youtubeUrl },
     });
 
     revalidatePath("/dashboard");
+    revalidatePath("/admin");
+    revalidatePath("/showcase");
     return { success: true };
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Failed to save submission." };
