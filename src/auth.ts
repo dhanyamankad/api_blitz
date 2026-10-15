@@ -15,19 +15,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const email = normalizeEmail(profile.email);
       if (!isDauEmail(email)) return false;
 
-      const name = profile.name ?? email;
+      const fallbackName = profile.name ?? email;
       const role = isAdminEmail(email) ? Role.admin : Role.participant;
       const user = await prisma.user.upsert({
         where: { email },
-        update: { name, role },
-        create: { email, name, role },
+        update: { role },
+        create: { email, name: fallbackName, role },
       });
 
-      // If a leader already added this person to a team, link their account and
-      // replace the typed name with their verified Google name.
+      // If a leader already added this person to a team, link their account.
+      // We do NOT overwrite the leader's typed name because Google accounts at DAU
+      // often have roll numbers/IDs as display names instead of actual human names.
       await prisma.teamMember.updateMany({
         where: { email, userId: null },
-        data: { userId: user.id, name },
+        data: { userId: user.id },
       });
       return true;
     },
