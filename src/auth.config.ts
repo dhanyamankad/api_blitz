@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import { isAdminEmail } from "@/lib/validation";
 
 export default {
+  trustHost: true,
   providers: [
     // hd restricts the Google account chooser; the real enforcement is the server-side check in auth.ts
     Google({ authorization: { params: { hd: "dau.ac.in", prompt: "select_account" } } }),
