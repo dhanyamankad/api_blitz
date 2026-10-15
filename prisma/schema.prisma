@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  participant
+  admin
+}
+
+enum TeamStatus {
+  pending_approval
+  approved
+  rejected
+}
+
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique // lowercase, @dau.ac.in only
+  name       String
+  role       Role        @default(participant)
+  createdAt  DateTime    @default(now())
+  membership TeamMember?
+}
+
+model Team {
+  id          String          @id @default(cuid())
+  name        String
+  nameLower   String          @unique // case-insensitive uniqueness
+  status      TeamStatus      @default(pending_approval)
+  createdAt   DateTime        @default(now())
+  members     TeamMember[]
+  assignments ApiAssignment[]
+  submission  Submission?
+}
+
+// One row per person on a team. email is UNIQUE so nobody can be on two teams,
+// even before the second member has ever logged in (userId is filled on first login).
+model TeamMember {
+  id       String  @id @default(cuid())
+  teamId   String
+  team     Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  email    String  @unique // lowercase
+  name     String
+  userId   String? @unique
+  user     User?   @relation(fields: [userId], references: [id])
+  isLeader Boolean @default(false)
+}
+
+model Api {
+  id          String          @id @default(cuid())
+  name        String
+  docsLink    String
+  assignments ApiAssignment[]
+}
+
+model ApiAssignment {
+  teamId String
+  apiId  String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  api    Api    @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, apiId])
+}
+
+// One submission per team; resubmitting updates this row.
+model Submission {
+  id          String   @id @default(cuid())
+  teamId      String   @unique
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  githubUrl   String
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Key/value config editable from the admin panel:
+// event_start_at, submission_deadline, whatsapp_url, rulebook_url, announcement, now_override
+model Setting {
+  key   String @id
+  value String
+}
