@@ -8,6 +8,7 @@ export type EventSettings = {
   announcement: string;
   nowOverride: Date | null;
   submissionsUnlocked: boolean;
+  apisPublished: boolean;
 };
 
 const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : null);
@@ -28,6 +29,7 @@ export async function getSettings(): Promise<EventSettings> {
     announcement: map.announcement ?? "",
     nowOverride: toDate(map.now_override),
     submissionsUnlocked: map.submissions_unlocked === "true",
+    apisPublished: map.apis_published === "true",
   };
 }
 
@@ -52,6 +54,11 @@ export function areSubmissionsOpen(s: EventSettings): boolean {
     return false;
   }
   return s.submissionsUnlocked;
+}
+
+/** APIs are revealed on participant dashboards only once published by organizers. */
+export function areApisPublished(s: EventSettings): boolean {
+  return s.apisPublished;
 }
 
 export function daysUntil(target: Date | null, s: EventSettings): number | null {

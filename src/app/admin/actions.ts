@@ -199,6 +199,106 @@ export async function addApiAction(formData: FormData): Promise<AdminActionState
 }
 
 /**
+ * Delete an API from the catalog.
+ */
+export async function deleteApiAction(apiId: string): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    await prisma.api.delete({
+      where: { id: apiId },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    return { success: true, message: "API removed from catalog." };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to delete API." };
+  }
+}
+
+/**
+ * Auto-assign 5 balanced APIs to a single specific team.
+ */
+export async function autoAssignTeamApisAction(teamId: string): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    const allApis = await prisma.api.findMany({
+      include: { assignments: true },
+    });
+
+    if (allApis.length < 5) {
+      return {
+        error: `Not enough APIs in pool (found ${allApis.length}, minimum 5 required). Add more APIs first.`,
+      };
+    }
+
+    // Sort APIs by lowest assignment count to balance variety + tiebreak shuffle
+    const sorted = allApis
+      .map((api) => ({ id: api.id, count: api.assignments.length }))
+      .sort((a, b) => {
+        if (a.count === b.count) return Math.random() - 0.5;
+        return a.count - b.count;
+      });
+
+    const chosen = sorted.slice(0, 5);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.apiAssignment.deleteMany({ where: { teamId } });
+      await tx.apiAssignment.createMany({
+        data: chosen.map((c) => ({ teamId, apiId: c.id })),
+      });
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    return { success: true, message: "5 balanced APIs allotted to squad successfully." };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to allot APIs to team." };
+  }
+}
+
+/**
+ * Instant toggle to publish or unpublish APIs to participants.
+ */
+export async function togglePublishApisAction(publish?: boolean): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    let nextValue: string;
+    if (typeof publish === "boolean") {
+      nextValue = publish ? "true" : "false";
+    } else {
+      const current = await prisma.setting.findUnique({
+        where: { key: "apis_published" },
+      });
+      nextValue = current?.value === "true" ? "false" : "true";
+    }
+
+    await prisma.setting.upsert({
+      where: { key: "apis_published" },
+      update: { value: nextValue },
+      create: { key: "apis_published", value: nextValue },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/");
+
+    return {
+      success: true,
+      message:
+        nextValue === "true"
+          ? "APIs published! All participants can now see their allotted APIs on their dashboard."
+          : "APIs locked/unpublished. Participants can no longer see their APIs.",
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to update API publish status." };
+  }
+}
+
+/**
  * Update global event settings (announcement, start time, deadline, links).
  */
 export async function updateSettingsAction(
@@ -216,12 +316,16 @@ export async function updateSettingsAction(
   const submissionsUnlocked =
     formData.get("submissions_unlocked") === "true" ||
     formData.get("submissions_unlocked") === "on";
+  const apisPublished =
+    formData.get("apis_published") === "true" ||
+    formData.get("apis_published") === "on";
 
   const updates: Record<string, string> = {
     announcement,
     whatsapp_url: whatsappUrl,
     rulebook_url: rulebookUrl,
     submissions_unlocked: submissionsUnlocked ? "true" : "false",
+    apis_published: apisPublished ? "true" : "false",
   };
 
   if (eventStartAt) {

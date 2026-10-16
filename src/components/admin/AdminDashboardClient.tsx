@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import {
   Users,
   CheckCircle2,
@@ -10,6 +12,8 @@ import {
   Settings,
   ShieldCheck,
   AlertCircle,
+  RefreshCw,
+  Radio,
 } from "lucide-react";
 import { ApprovalQueue } from "./ApprovalQueue";
 import { ApiAssignmentManager } from "./ApiAssignmentManager";
@@ -68,6 +72,7 @@ interface AdminDashboardClientProps {
     announcement: string;
     nowOverride: Date | null;
     submissionsUnlocked?: boolean;
+    apisPublished?: boolean;
   };
 }
 
@@ -75,6 +80,55 @@ type TabType = "queue" | "apis" | "submissions" | "settings";
 
 export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>("queue");
+  const router = useRouter();
+  const [isSyncing, startSync] = useTransition();
+
+  const handleManualSync = () => {
+    startSync(() => {
+      router.refresh();
+    });
+  };
+
+  // Real-time synchronization across all logged-in admins
+  useEffect(() => {
+    // 1. Supabase Realtime channel for instant postgres changes
+    const supabase = createClient();
+    const channel = supabase
+      .channel("admin-multi-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public" },
+        () => {
+          startSync(() => {
+            router.refresh();
+          });
+        }
+      )
+      .subscribe();
+
+    // 2. Fallback polling every 8s while the tab is active
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        startSync(() => {
+          router.refresh();
+        });
+      }
+    }, 8000);
+
+    // 3. Instant sync whenever the admin tabs back into the window
+    const onFocus = () => {
+      startSync(() => {
+        router.refresh();
+      });
+    };
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [router]);
 
   const pendingTeams = teams.filter((t) => t.status === "pending_approval");
   const approvedTeams = teams.filter((t) => t.status === "approved");
@@ -170,39 +224,62 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
         </div>
       </div>
 
-      {/* Navigation Tab Bar */}
-      <div className="flex overflow-x-auto border-b border-slate-800 pb-px gap-2">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 border-b-2 text-xs font-mono font-semibold transition-colors whitespace-nowrap ${
-                isActive
-                  ? "border-sky-400 text-sky-400 bg-sky-500/5"
-                  : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-              {typeof tab.badge !== "undefined" && (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    tab.alert
-                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                      : isActive
-                      ? "bg-sky-500/20 text-sky-300"
-                      : "bg-slate-800 text-slate-400"
-                  }`}
-                >
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      {/* Navigation Tab Bar & Live Sync Status */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-px gap-3">
+        <div className="flex overflow-x-auto gap-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 border-b-2 text-xs font-mono font-semibold transition-colors whitespace-nowrap ${
+                  isActive
+                    ? "border-sky-400 text-sky-400 bg-sky-500/5"
+                    : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{tab.label}</span>
+                {typeof tab.badge !== "undefined" && (
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      tab.alert
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                        : isActive
+                        ? "bg-sky-500/20 text-sky-300"
+                        : "bg-slate-800 text-slate-400"
+                    }`}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Real-time synchronization indicator & action */}
+        <div className="flex items-center gap-2.5 pb-2 sm:pb-0 px-2 sm:px-0 self-end sm:self-auto">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-mono text-emerald-400">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>LIVE SYNC ACTIVE</span>
+          </div>
+
+          <button
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            title="Force refresh database state across all organizers"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin text-sky-400" : ""}`} />
+            <span>{isSyncing ? "Syncing..." : "Sync Now"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Tab Panels */}
@@ -212,7 +289,11 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
         )}
 
         {activeTab === "apis" && (
-          <ApiAssignmentManager apis={apis} approvedTeams={approvedTeams} />
+          <ApiAssignmentManager
+            apis={apis}
+            approvedTeams={approvedTeams}
+            apisPublished={settings.apisPublished}
+          />
         )}
 
         {activeTab === "submissions" && (

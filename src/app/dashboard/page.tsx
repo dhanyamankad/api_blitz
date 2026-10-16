@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getSettings, eventPhase, areSubmissionsOpen } from "@/lib/settings";
+import { getSettings, eventPhase, areSubmissionsOpen, areApisPublished } from "@/lib/settings";
 import { normalizeEmail } from "@/lib/validation";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { RegistrationForm } from "@/components/dashboard/RegistrationForm";
@@ -44,6 +44,7 @@ export default async function DashboardPage() {
 
   const phase = eventPhase(s);
   const isSubmissionsOpen = areSubmissionsOpen(s);
+  const isApisPublished = areApisPublished(s);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#030712] text-slate-100">
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
             rulebookUrl={s.rulebookUrl}
             phase={phase}
             isSubmissionsOpen={isSubmissionsOpen}
+            apisPublished={isApisPublished}
           />
         )}
 

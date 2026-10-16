@@ -50,6 +50,7 @@ interface ApprovedDashboardProps {
   rulebookUrl?: string;
   phase: "before_start" | "live" | "ended";
   isSubmissionsOpen?: boolean;
+  apisPublished?: boolean;
 }
 
 export function ApprovedDashboard({
@@ -59,6 +60,7 @@ export function ApprovedDashboard({
   rulebookUrl,
   phase,
   isSubmissionsOpen = false,
+  apisPublished = false,
 }: ApprovedDashboardProps) {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     submitGithubAction,
@@ -67,7 +69,7 @@ export function ApprovedDashboard({
 
   const hasSubmitted = !!team.submission;
   const isSubmissionLocked = !isSubmissionsOpen;
-  const isApiLocked = phase === "before_start";
+  const isApiLocked = !apisPublished;
 
   // Progress Steps calculation
   const steps = [
@@ -179,22 +181,29 @@ export function ApprovedDashboard({
               ALLOTTED API STACK (5 APIS)
             </h2>
           </div>
-          <span className="text-xs font-mono text-slate-400">
-            {isApiLocked ? "LOCKED UNTIL KICKOFF" : "UNLOCKED"}
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium ${
+              !isApiLocked
+                ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : "border border-amber-500/30 bg-amber-500/10 text-amber-400"
+            }`}
+          >
+            {isApiLocked ? <Lock className="h-3 w-3" /> : <Code2 className="h-3 w-3" />}
+            <span>{isApiLocked ? "LOCKED BY ORGANIZERS" : "5 APIS UNLOCKED"}</span>
           </span>
         </div>
 
         {isApiLocked ? (
           /* Locked State */
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-8 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 border border-slate-800 text-slate-400 mb-4">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 border border-amber-500/30 text-amber-400 mb-4">
               <Lock className="h-5 w-5" />
             </div>
             <h3 className="text-base font-bold text-white font-mono">
-              API Bundle Locked
+              Secret API Stack Locked
             </h3>
             <p className="mt-1.5 text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-              Your 5 assigned APIs will be automatically revealed on your dashboard when the event begins on 27 October 2026, 7:00 PM IST.
+              Your 5 assigned APIs will be revealed right here on your dashboard when organizers publish the API bundles for the sprint. Stay tuned!
             </p>
           </div>
         ) : team.assignments.length === 0 ? (

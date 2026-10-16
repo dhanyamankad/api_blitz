@@ -13,6 +13,7 @@ interface EventSettingsManagerProps {
     announcement: string;
     nowOverride: Date | null;
     submissionsUnlocked?: boolean;
+    apisPublished?: boolean;
   };
 }
 
@@ -99,6 +100,43 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
               <span className="text-[10px] font-mono text-slate-400 block mt-1">
                 Submissions automatically lock on server after this moment.
               </span>
+            </div>
+          </div>
+
+          {/* Publish APIs to Participants Toggle */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🚀</span>
+                  <span className="text-xs font-mono font-bold text-white tracking-wide uppercase">
+                    Publish Allotted APIs to Participants
+                  </span>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                      settings.apisPublished
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                        : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                    }`}
+                  >
+                    {settings.apisPublished ? "PUBLISHED (LIVE)" : "UNPUBLISHED (LOCKED)"}
+                  </span>
+                </div>
+                <p className="text-[11px] font-mono text-slate-400 leading-relaxed max-w-xl">
+                  When enabled, participant dashboards will unlock and reveal their 5 allotted APIs along with direct documentation links. Keep disabled until official sprint kickoff.
+                </p>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  name="apis_published"
+                  value="true"
+                  defaultChecked={settings.apisPublished}
+                  className="sr-only peer"
+                />
+                <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
             </div>
           </div>
 
