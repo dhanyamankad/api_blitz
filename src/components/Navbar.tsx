@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { Users, ShieldAlert, LogIn, ExternalLink } from "lucide-react";
 import { auth } from "@/auth";
+import { NavbarClient } from "@/components/NavbarClient";
 
 export async function Navbar() {
   const session = await auth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 relative">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3.5 group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -32,56 +32,8 @@ export async function Navbar() {
           </div>
         </Link>
 
-        {/* Center / Nav Links */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/#about"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            About
-          </Link>
-          <Link
-            href="/#timeline"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            Timeline
-          </Link>
-          <Link
-            href="/rulebook"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            Rulebook
-          </Link>
-        </nav>
-
-        {/* Action Button */}
-        <div className="flex items-center gap-3">
-          {session?.user ? (
-            session.user.role === "admin" ? (
-              <Link
-                href="/admin"
-                className="flex items-center gap-2 rounded-lg bg-purple-500 hover:bg-purple-400 px-4 py-2 text-xs font-mono font-semibold text-slate-950 transition-colors shadow-sm"
-              >
-                <span>Admin Console</span>
-              </Link>
-            ) : (
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 px-4 py-2 text-xs font-mono font-semibold text-slate-950 transition-colors shadow-sm"
-              >
-                <span>Go to Dashboard</span>
-              </Link>
-            )
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 px-4 py-2 text-xs font-mono font-semibold text-slate-950 transition-colors shadow-sm"
-            >
-              <LogIn className="h-4 w-4" />
-              <span>DAU Sign In</span>
-            </Link>
-          )}
-        </div>
+        {/* Client Navigation & Mobile Menu */}
+        <NavbarClient session={session} />
       </div>
     </header>
   );

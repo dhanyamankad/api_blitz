@@ -6,6 +6,9 @@ export type EventSettings = {
   submissionDeadline: Date | null;
   whatsappUrl: string;
   rulebookUrl: string;
+  rulebookFileName?: string;
+  rulebookFileUpdatedAt?: Date | null;
+  rulebookFileSize?: number;
   announcement: string;
   nowOverride: Date | null;
   submissionsUnlocked: boolean;
@@ -17,7 +20,13 @@ const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) 
 export const getSettings = cache(async (): Promise<EventSettings> => {
   let map: Record<string, string> = {};
   try {
-    const rows = await prisma.setting.findMany();
+    const rows = await prisma.setting.findMany({
+      where: {
+        key: {
+          not: "rulebook_pdf_base64",
+        },
+      },
+    });
     map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   } catch {
     // DB unreachable (e.g. first local run): fall back to empty settings
@@ -27,6 +36,9 @@ export const getSettings = cache(async (): Promise<EventSettings> => {
     submissionDeadline: toDate(map.submission_deadline),
     whatsappUrl: map.whatsapp_url ?? "",
     rulebookUrl: map.rulebook_url ?? "",
+    rulebookFileName: map.rulebook_file_name ?? "",
+    rulebookFileUpdatedAt: toDate(map.rulebook_file_updated_at),
+    rulebookFileSize: map.rulebook_file_size ? parseInt(map.rulebook_file_size, 10) : undefined,
     announcement: map.announcement ?? "",
     nowOverride: toDate(map.now_override),
     submissionsUnlocked: map.submissions_unlocked === "true",

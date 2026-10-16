@@ -73,21 +73,31 @@ export function Countdown({ targetDate, phase }: CountdownProps) {
 
   return (
     <div className="relative mx-auto max-w-2xl">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 sm:p-7 backdrop-blur-sm">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-7 backdrop-blur-sm">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-3.5 mb-5">
-          <span className="font-mono text-xs uppercase tracking-widest text-sky-400 font-semibold">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/80 pb-3 mb-4 gap-1 sm:gap-2">
+          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-sky-400 font-semibold">
             {title}
           </span>
 
-          <div className="flex items-center gap-1.5 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-mono text-slate-400">
             <Clock className="h-3.5 w-3.5 text-slate-500" />
-            <span>27 OCT 2026 · 19:00 IST</span>
+            <span>
+              {targetDate
+                ? new Date(targetDate).toLocaleString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    timeZoneName: "short",
+                  })
+                : "27 OCT 2026 · 19:00 IST"}
+            </span>
           </div>
         </div>
 
         {/* Digits Grid */}
-        <div className="grid grid-cols-4 gap-3 sm:gap-4 text-center">
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 text-center">
           {[
             { label: "DAYS", val: timeLeft?.days ?? 0 },
             { label: "HOURS", val: timeLeft?.hours ?? 0 },
@@ -96,12 +106,12 @@ export function Countdown({ targetDate, phase }: CountdownProps) {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="flex flex-col items-center justify-center rounded-xl bg-slate-950/80 border border-slate-800 p-3 sm:p-4"
+              className="flex flex-col items-center justify-center rounded-xl bg-slate-950/80 border border-slate-800 p-2 sm:p-4 min-w-0"
             >
-              <div className="font-mono text-3xl sm:text-5xl font-black tracking-tight text-white">
+              <div className="font-mono text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
                 {String(item.val).padStart(2, "0")}
               </div>
-              <span className="mt-2 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-slate-400">
+              <span className="mt-1.5 text-[9px] sm:text-xs font-mono uppercase tracking-wider sm:tracking-widest text-slate-400">
                 {item.label}
               </span>
             </div>

@@ -69,6 +69,9 @@ interface AdminDashboardClientProps {
     submissionDeadline: Date | null;
     whatsappUrl: string;
     rulebookUrl: string;
+    rulebookFileName?: string;
+    rulebookFileUpdatedAt?: Date | null;
+    rulebookFileSize?: number;
     announcement: string;
     nowOverride: Date | null;
     submissionsUnlocked?: boolean;
@@ -226,7 +229,7 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
 
       {/* Navigation Tab Bar & Live Sync Status */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-px gap-3">
-        <div className="flex overflow-x-auto gap-2">
+        <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

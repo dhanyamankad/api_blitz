@@ -14,7 +14,9 @@ import {
   AlertCircle,
   ExternalLink,
   CheckCircle2,
+  Smartphone,
 } from "lucide-react";
+import { getSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +25,9 @@ export const metadata = {
   description: "Official guidelines, eligibility, API allotment rules, submission criteria, and evaluation schedule for API Blitz 2026 at Dhirubhai Ambani University.",
 };
 
-export default function RulebookPage() {
+export default async function RulebookPage() {
+  const settings = await getSettings();
+  const pdfUrl = settings.rulebookUrl || "/rulebook.pdf";
   return (
     <div className="min-h-screen flex flex-col bg-[#030712] text-slate-100">
       <Navbar />
@@ -43,22 +47,22 @@ export default function RulebookPage() {
           </p>
 
           {/* Quick PDF Action Buttons */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto">
             <a
-              href="/rulebook.pdf"
+              href={pdfUrl}
               download="API-Blitz-2026-Rulebook.pdf"
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono font-bold text-xs px-5 py-2.5 transition-colors shadow-sm"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono font-bold text-xs px-5 py-3 sm:py-2.5 transition-colors shadow-sm"
             >
               <Download className="h-4 w-4" />
               <span>Download Official PDF</span>
             </a>
             <a
-              href="/rulebook.pdf"
+              href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-mono text-xs px-4 py-2.5 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-mono text-xs px-4 py-3 sm:py-2.5 transition-colors"
             >
-              <span>Open in New Tab</span>
+              <span>Open in Fullscreen Reader</span>
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -283,14 +287,14 @@ export default function RulebookPage() {
           </section>
 
           {/* Embedded PDF Viewer Section */}
-          <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-sm space-y-4">
+          <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-8 backdrop-blur-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Document Embed</span>
                 <h2 className="text-lg font-bold text-white font-mono">Original PDF Document</h2>
               </div>
               <a
-                href="/rulebook.pdf"
+                href={pdfUrl}
                 download="API-Blitz-2026-Rulebook.pdf"
                 className="inline-flex items-center gap-2 text-xs font-mono text-sky-400 hover:underline"
               >
@@ -299,9 +303,29 @@ export default function RulebookPage() {
               </a>
             </div>
 
-            <div className="w-full h-[650px] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+            {/* Mobile Optimization Assistance Banner */}
+            <div className="sm:hidden rounded-xl border border-sky-500/30 bg-sky-950/20 p-4 text-xs font-mono space-y-2.5">
+              <div className="flex items-center gap-2 text-sky-300 font-semibold">
+                <Smartphone className="h-4 w-4 shrink-0 text-sky-400" />
+                <span>Reading on Mobile?</span>
+              </div>
+              <p className="text-slate-400 text-[11px] leading-relaxed">
+                For smooth pinch-to-zoom and multi-page reading on phones, open the document directly in the browser&apos;s native PDF viewer.
+              </p>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono font-bold text-xs py-2.5 w-full transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+                <span>Open Fullscreen Reader</span>
+              </a>
+            </div>
+
+            <div className="w-full h-[420px] sm:h-[650px] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
               <iframe
-                src="/rulebook.pdf"
+                src={pdfUrl}
                 title="API Blitz Official Rulebook"
                 className="w-full h-full border-none"
               />

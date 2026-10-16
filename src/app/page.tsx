@@ -61,11 +61,11 @@ export default async function Home() {
             </p>
 
             {/* CTAs */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-md mx-auto sm:max-w-none">
               {session?.user ? (
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 px-6 py-3.5 text-sm font-mono font-bold text-slate-950 transition-colors shadow-sm"
+                  className="flex items-center justify-center gap-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 px-6 py-3.5 text-sm font-mono font-bold text-slate-950 transition-colors shadow-sm"
                 >
                   <Sparkles className="h-4 w-4" />
                   <span>Open Your Team Dashboard</span>
@@ -74,7 +74,7 @@ export default async function Home() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 px-6 py-3.5 text-sm font-mono font-bold text-slate-950 transition-colors shadow-sm"
+                  className="flex items-center justify-center gap-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 px-6 py-3.5 text-sm font-mono font-bold text-slate-950 transition-colors shadow-sm"
                 >
                   <Terminal className="h-4 w-4" />
                   <span>Sign In with @dau.ac.in</span>
@@ -86,7 +86,7 @@ export default async function Home() {
                 href={s.rulebookUrl || "/rulebook.pdf"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-3.5 text-sm font-mono font-medium text-slate-200 hover:border-cyan-400/50 hover:bg-slate-900 transition-all"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-3.5 text-sm font-mono font-medium text-slate-200 hover:border-cyan-400/50 hover:bg-slate-900 transition-all"
               >
                 <FileText className="h-4 w-4 text-cyan-400" />
                 <span>View Rulebook (PDF)</span>

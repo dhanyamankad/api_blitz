@@ -104,10 +104,10 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
     <div className="space-y-6">
       {/* Top Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <button
             onClick={() => setFilter("all")}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors ${
+            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors shrink-0 ${
               filter === "all"
                 ? "bg-sky-500/20 text-sky-300 border border-sky-500/30"
                 : "bg-slate-900 text-slate-400 border border-slate-800"
@@ -117,7 +117,7 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
           </button>
           <button
             onClick={() => setFilter("submitted")}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors flex items-center gap-1.5 ${
+            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors flex items-center gap-1.5 shrink-0 ${
               filter === "submitted"
                 ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                 : "bg-slate-900 text-slate-400 border border-slate-800"
@@ -128,7 +128,7 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
           </button>
           <button
             onClick={() => setFilter("unsubmitted")}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors ${
+            className={`rounded-lg px-3.5 py-1.5 text-xs font-mono font-medium transition-colors shrink-0 ${
               filter === "unsubmitted"
                 ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
                 : "bg-slate-900 text-slate-400 border border-slate-800"
@@ -138,21 +138,21 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+          <div className="relative w-full sm:w-60">
             <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search team or repo..."
-              className="rounded-lg border border-slate-800 bg-slate-950 pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 w-48 sm:w-60"
+              className="rounded-lg border border-slate-800 bg-slate-950 pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 w-full"
             />
           </div>
 
           <button
             onClick={exportCSV}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3.5 py-1.5 text-xs font-mono font-semibold text-white transition-colors shrink-0"
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3.5 py-2 sm:py-1.5 text-xs font-mono font-semibold text-white transition-colors shrink-0"
           >
             <Download className="h-3.5 w-3.5 text-sky-400" />
             <span>Export CSV</span>

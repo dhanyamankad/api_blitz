@@ -115,7 +115,7 @@ export function ApprovedDashboard({
           <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3">
             EVENT PROGRESS TRACKER
           </div>
-          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
             {steps.map((st, i) => (
               <div
                 key={i}
@@ -382,7 +382,7 @@ export function ApprovedDashboard({
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-500 px-6 py-2.5 text-xs font-mono font-bold text-slate-950 transition-colors"
+              className="w-full sm:w-auto rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-500 px-6 py-3 sm:py-2.5 text-xs font-mono font-bold text-slate-950 transition-colors shadow-sm"
             >
               {isPending
                 ? "Saving Submission..."

@@ -320,6 +320,9 @@ export async function updateSettingsAction(
     formData.get("apis_published") === "true" ||
     formData.get("apis_published") === "on";
 
+  const removeRulebookFile = formData.get("remove_rulebook_file") === "true";
+  const rulebookFile = formData.get("rulebook_file") as File | null;
+
   const updates: Record<string, string> = {
     announcement,
     whatsapp_url: whatsappUrl,
@@ -327,6 +330,48 @@ export async function updateSettingsAction(
     submissions_unlocked: submissionsUnlocked ? "true" : "false",
     apis_published: apisPublished ? "true" : "false",
   };
+
+  if (removeRulebookFile) {
+    try {
+      await prisma.setting.deleteMany({
+        where: {
+          key: {
+            in: [
+              "rulebook_pdf_base64",
+              "rulebook_file_name",
+              "rulebook_file_size",
+              "rulebook_file_updated_at",
+            ],
+          },
+        },
+      });
+      updates.rulebook_url = "";
+    } catch {
+      // ignore if keys do not exist
+    }
+  } else if (rulebookFile && rulebookFile.size > 0) {
+    const isPdf =
+      rulebookFile.type === "application/pdf" ||
+      rulebookFile.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      return { error: "The uploaded file must be a valid PDF document (.pdf)." };
+    }
+    if (rulebookFile.size > 15 * 1024 * 1024) {
+      return { error: "The rulebook file size exceeds the 15MB limit." };
+    }
+
+    try {
+      const bytes = await rulebookFile.arrayBuffer();
+      const base64 = Buffer.from(bytes).toString("base64");
+      updates.rulebook_pdf_base64 = base64;
+      updates.rulebook_file_name = rulebookFile.name;
+      updates.rulebook_file_size = String(rulebookFile.size);
+      updates.rulebook_file_updated_at = new Date().toISOString();
+      updates.rulebook_url = "/api/rulebook";
+    } catch {
+      return { error: "Failed to process rulebook file upload." };
+    }
+  }
 
   if (eventStartAt) {
     const d = new Date(eventStartAt);
@@ -356,9 +401,43 @@ export async function updateSettingsAction(
 
     revalidatePath("/admin");
     revalidatePath("/");
+    revalidatePath("/rulebook");
     revalidatePath("/dashboard");
-    return { success: true, message: "Event configuration updated successfully." };
+    return { success: true, message: "Event configuration and rulebook updated successfully." };
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Failed to save settings." };
+  }
+}
+
+/**
+ * Remove uploaded custom rulebook and revert back to default /rulebook.pdf
+ */
+export async function removeRulebookAction(): Promise<AdminActionState> {
+  await verifyAdmin();
+  try {
+    await prisma.setting.deleteMany({
+      where: {
+        key: {
+          in: [
+            "rulebook_pdf_base64",
+            "rulebook_file_name",
+            "rulebook_file_size",
+            "rulebook_file_updated_at",
+          ],
+        },
+      },
+    });
+    await prisma.setting.upsert({
+      where: { key: "rulebook_url" },
+      update: { value: "" },
+      create: { key: "rulebook_url", value: "" },
+    });
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath("/rulebook");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Custom rulebook removed. Reverted to default rulebook." };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to remove rulebook file." };
   }
 }
