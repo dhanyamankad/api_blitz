@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isAdminEmail, normalizeEmail } from "@/lib/validation";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export type SessionUser = {
   id: string;
@@ -18,8 +19,9 @@ export type Session = {
 /**
  * Returns the currently authenticated user's session from Supabase SSR cookies,
  * enriched with their role and profile data from the database.
+ * Memoized per-request using React cache to eliminate redundant network roundtrips.
  */
-export async function auth(): Promise<Session | null> {
+export const auth = cache(async (): Promise<Session | null> => {
   try {
     const supabase = await createClient();
     const {
@@ -68,7 +70,7 @@ export async function auth(): Promise<Session | null> {
   } catch {
     return null;
   }
-}
+});
 
 /**
  * Initiates Supabase Google OAuth sign-in.

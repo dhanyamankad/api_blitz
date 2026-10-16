@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Suspense } from "react";
+import { NavigationProgressBar } from "@/components/NavigationProgressBar";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,6 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
       <body className="min-h-screen bg-[#030712] font-sans text-slate-100 antialiased tech-grid">
+        <Suspense fallback={null}>
+          <NavigationProgressBar />
+        </Suspense>
         <div className="flex min-h-screen flex-col">
           {children}
         </div>

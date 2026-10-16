@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
 
 export type EventSettings = {
   eventStartAt: Date | null;
@@ -13,7 +14,7 @@ export type EventSettings = {
 
 const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : null);
 
-export async function getSettings(): Promise<EventSettings> {
+export const getSettings = cache(async (): Promise<EventSettings> => {
   let map: Record<string, string> = {};
   try {
     const rows = await prisma.setting.findMany();
@@ -31,7 +32,7 @@ export async function getSettings(): Promise<EventSettings> {
     submissionsUnlocked: map.submissions_unlocked === "true",
     apisPublished: map.apis_published === "true",
   };
-}
+});
 
 /** The site's notion of "now". Admins can set now_override to test reveal/lock behaviour. */
 export function siteNow(s: EventSettings): Date {
