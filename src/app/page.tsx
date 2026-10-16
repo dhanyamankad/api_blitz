@@ -4,7 +4,6 @@ import { getSettings, eventPhase } from "@/lib/settings";
 import { auth } from "@/auth";
 import { Navbar } from "@/components/Navbar";
 import { Countdown } from "@/components/Countdown";
-import { LiveActivityTicker } from "@/components/LiveActivityTicker";
 import { EventOverview } from "@/components/EventOverview";
 import { Timeline } from "@/components/Timeline";
 import { Footer } from "@/components/Footer";
@@ -38,14 +37,29 @@ export default async function Home() {
         {/* HERO SECTION */}
         <section className="relative pt-14 pb-16 sm:pt-20 sm:pb-24 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-            {/* Activity Ticker */}
-            <div className="mb-8 w-full">
-              <LiveActivityTicker />
-            </div>
+            {/* Sponsor & Organizer Banner: NEON x MSTC */}
+            <div className="inline-flex items-center gap-3 sm:gap-4 rounded-full border border-slate-800/80 bg-slate-900/90 px-4 sm:px-6 py-2 sm:py-2.5 backdrop-blur-md mb-8 shadow-xl hover:border-slate-700 transition-all">
+              <div className="flex items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/neon-logo.svg"
+                  alt="Neon"
+                  className="h-4 sm:h-5 w-auto object-contain"
+                />
+              </div>
 
-            {/* Club Pill */}
-            <div className="inline-flex items-center rounded-full border border-slate-800 bg-slate-900/90 px-4 py-1.5 text-xs font-mono font-medium text-slate-300 mb-6">
-              <span>MSTC PRESENTS</span>
+              <span className="text-xs sm:text-sm font-mono font-bold text-slate-500 select-none">
+                ✕
+              </span>
+
+              <div className="flex items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="MSTC"
+                  className="h-4 sm:h-5 w-auto object-contain"
+                />
+              </div>
             </div>
 
             {/* Main Headline */}
