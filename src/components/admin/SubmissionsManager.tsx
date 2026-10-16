@@ -160,9 +160,91 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
         </div>
       </div>
 
-      {/* Submissions Table */}
+      {/* Submissions Table & Mobile Cards */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden backdrop-blur-sm">
-        <div className="overflow-x-auto">
+        {/* Mobile View: Cards */}
+        <div className="md:hidden divide-y divide-slate-800/60">
+          {filtered.length === 0 ? (
+            <div className="py-8 text-center text-xs font-mono text-slate-500">
+              No matching submissions found.
+            </div>
+          ) : (
+            filtered.map((team) => {
+              const leader = team.members.find((m) => m.isLeader);
+              const partner = team.members.find((m) => !m.isLeader);
+
+              return (
+                <div key={team.id} className="p-4 space-y-3 font-mono text-xs">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-sm truncate">{team.name}</h4>
+                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                        {leader?.name} & {partner?.name}
+                      </p>
+                      <p className="text-[10px] text-slate-500 truncate">
+                        {leader?.email}
+                      </p>
+                    </div>
+                    {team.submission ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 shrink-0">
+                        <CheckCircle2 className="h-3 w-3" />
+                        SUBMITTED
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded bg-slate-800 text-slate-400 px-2 py-0.5 text-[10px] shrink-0">
+                        <Clock className="h-3 w-3" />
+                        NO SUBMISSION
+                      </span>
+                    )}
+                  </div>
+
+                  {team.submission ? (
+                    <div className="space-y-1.5 pt-1">
+                      <a
+                        href={team.submission.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-400 hover:underline flex items-center gap-1.5 text-xs bg-slate-950/60 border border-slate-800/80 rounded-lg p-2"
+                      >
+                        <GitBranch className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{team.submission.githubUrl}</span>
+                        <ExternalLink className="h-3 w-3 shrink-0 ml-auto" />
+                      </a>
+                      {team.submission.youtubeUrl && (
+                        <a
+                          href={team.submission.youtubeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-red-400 hover:underline flex items-center gap-1.5 text-xs bg-slate-950/60 border border-slate-800/80 rounded-lg p-2"
+                        >
+                          <Video className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{team.submission.youtubeUrl}</span>
+                          <ExternalLink className="h-3 w-3 shrink-0 ml-auto" />
+                        </a>
+                      )}
+                      <div className="text-[10px] text-slate-500 pt-0.5">
+                        Updated:{" "}
+                        {new Date(team.submission.updatedAt).toLocaleTimeString("en-IN", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-slate-600 italic">
+                      No project deliverables recorded yet.
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop View: Full Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead className="border-b border-slate-800 bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[10px]">
               <tr>

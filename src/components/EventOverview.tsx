@@ -104,30 +104,30 @@ export function EventOverview({ rulebookUrl }: EventOverviewProps) {
         </div>
 
         {/* Rulebook Download Banner */}
-        <div className="mt-12 rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-slate-950 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl backdrop-blur-xl">
-          <div className="flex items-center gap-4">
-            <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
-              <FileText className="h-7 w-7" />
+        <div className="mt-12 rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-slate-950 p-4 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-6 shadow-xl backdrop-blur-xl">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
+              <FileText className="h-6 w-6 sm:h-7 sm:w-7" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-white">Official Event Rulebook & Guidelines</h4>
-              <p className="text-xs text-slate-400 mt-1 max-w-xl">
+              <h4 className="text-base sm:text-lg font-bold text-white">Official Event Rulebook & Guidelines</h4>
+              <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
                 Read the complete judging criteria, submission requirements, team policies, and technical rules before kickoff.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0 w-full sm:w-auto">
             <Link
               href="/rulebook"
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 px-5 py-2.5 text-xs font-mono font-semibold text-white transition-all"
+              className="flex items-center justify-center gap-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 px-5 py-3 sm:py-2.5 text-xs font-mono font-semibold text-white transition-all active:scale-[0.98]"
             >
               <FileText className="h-4 w-4 text-cyan-400" />
-              View Rulebook
+              <span>View Rulebook</span>
             </Link>
             <Link
               href="/login"
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-xs font-mono font-bold text-slate-950 hover:brightness-110 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all"
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 sm:py-2.5 text-xs font-mono font-bold text-slate-950 hover:brightness-110 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all active:scale-[0.98]"
             >
               <span>Register Squad</span>
               <ArrowRight className="h-4 w-4" />

@@ -19,7 +19,7 @@ export function RegistrationForm({ leader }: RegistrationFormProps) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
         {/* Header */}
         <div className="border-b border-slate-800 pb-6 mb-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-mono font-medium text-sky-300 mb-3">

@@ -96,15 +96,13 @@ export default async function Home() {
                 </Link>
               )}
 
-              <a
-                href={s.rulebookUrl || "/rulebook.pdf"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-3.5 text-sm font-mono font-medium text-slate-200 hover:border-cyan-400/50 hover:bg-slate-900 transition-all"
+              <Link
+                href="/rulebook"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-3.5 text-sm font-mono font-medium text-slate-200 hover:border-cyan-400/50 hover:bg-slate-900 transition-all active:scale-[0.98]"
               >
                 <FileText className="h-4 w-4 text-cyan-400" />
-                <span>View Rulebook (PDF)</span>
-              </a>
+                <span>View Rulebook</span>
+              </Link>
             </div>
 
             {/* Dynamic Countdown Section */}

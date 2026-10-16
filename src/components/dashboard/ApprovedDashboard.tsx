@@ -81,7 +81,7 @@ export function ApprovedDashboard({
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       {/* Squad Header & Progress Tracker */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -94,7 +94,7 @@ export function ApprovedDashboard({
                 <span>6 HOUR SPRINT</span>
               </span>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {team.name}
             </h1>
           </div>
@@ -173,16 +173,16 @@ export function ApprovedDashboard({
       </div>
 
       {/* 5 ALLOTTED APIS SECTION */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800 mb-6">
           <div className="flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-sky-400" />
-            <h2 className="text-lg font-bold text-white tracking-tight font-mono">
+            <Code2 className="h-5 w-5 text-sky-400 shrink-0" />
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight font-mono">
               ALLOTTED API STACK (5 APIS)
             </h2>
           </div>
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium self-start sm:self-auto ${
               !isApiLocked
                 ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                 : "border border-amber-500/30 bg-amber-500/10 text-amber-400"
@@ -243,16 +243,16 @@ export function ApprovedDashboard({
       </div>
 
       {/* GITHUB SUBMISSION SECTION */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800 mb-6">
           <div className="flex items-center gap-2">
-            <GitBranch className="h-5 w-5 text-white" />
-            <h2 className="text-lg font-bold text-white tracking-tight font-mono">
+            <GitBranch className="h-5 w-5 text-white shrink-0" />
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight font-mono">
               PROJECT SUBMISSION
             </h2>
           </div>
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-medium self-start sm:self-auto ${
               !isSubmissionLocked
                 ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                 : phase === "ended"
@@ -273,15 +273,15 @@ export function ApprovedDashboard({
 
         {/* Existing Submission Details if available */}
         {hasSubmitted && (
-          <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950/60 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
-            <div>
+          <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+            <div className="min-w-0">
               <div className="text-[10px] text-slate-400 uppercase">Current Submission</div>
               <div className="space-y-1.5 mt-1">
                 <a
                   href={team.submission?.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sky-400 hover:underline font-medium text-sm flex items-center gap-1.5"
+                  className="text-sky-400 hover:underline font-medium text-xs sm:text-sm flex items-center gap-1.5 truncate"
                 >
                   <GitBranch className="h-3.5 w-3.5 shrink-0" />
                   <span className="truncate">{team.submission?.githubUrl}</span>
@@ -292,7 +292,7 @@ export function ApprovedDashboard({
                     href={team.submission.youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-red-400 hover:underline font-medium text-sm flex items-center gap-1.5"
+                    className="text-red-400 hover:underline font-medium text-xs sm:text-sm flex items-center gap-1.5 truncate"
                   >
                     <Video className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{team.submission.youtubeUrl}</span>
@@ -301,7 +301,7 @@ export function ApprovedDashboard({
                 )}
               </div>
             </div>
-            <div className="text-right text-[10px] text-slate-400">
+            <div className="text-left sm:text-right text-[10px] text-slate-400 shrink-0">
               <div>Updated: {team.submission?.updatedAt ? new Date(team.submission.updatedAt).toLocaleString("en-IN") : "Recorded"}</div>
             </div>
           </div>

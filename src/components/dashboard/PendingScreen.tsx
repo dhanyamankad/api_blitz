@@ -60,7 +60,7 @@ export function PendingScreen({ team, currentUserEmail }: PendingScreenProps) {
       )}
 
       {/* Main Status Panel */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 backdrop-blur-md shadow-xl">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
         {/* Status Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
           <div>
@@ -76,7 +76,7 @@ export function PendingScreen({ team, currentUserEmail }: PendingScreenProps) {
           {isLeader && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-mono font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 sm:py-2 text-xs font-mono font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors active:scale-[0.98]"
             >
               <Edit3 className="h-3.5 w-3.5" />
               <span>Edit Squad Info</span>

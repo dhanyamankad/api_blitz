@@ -58,9 +58,9 @@ export function Timeline() {
 
         <div className="relative max-w-4xl mx-auto">
           {/* Vertical Track Line */}
-          <div className="absolute left-4 sm:left-1/2 top-4 bottom-4 w-px -translate-x-1/2 bg-gradient-to-b from-cyan-500 via-purple-500 to-transparent opacity-30" />
+          <div className="absolute left-3.5 sm:left-1/2 top-4 bottom-4 w-px -translate-x-1/2 bg-gradient-to-b from-cyan-500 via-purple-500 to-transparent opacity-30" />
 
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {steps.map((s, idx) => {
               const Icon = s.icon;
               const isEven = idx % 2 === 0;
@@ -73,26 +73,26 @@ export function Timeline() {
                   }`}
                 >
                   {/* Center Node Icon */}
-                  <div className="absolute left-4 sm:left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.4)] z-10">
-                    <Icon className="h-4 w-4 text-cyan-400" />
+                  <div className="absolute left-3.5 sm:left-1/2 -translate-x-1/2 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-slate-950 border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.4)] z-10">
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-400" />
                   </div>
 
                   {/* Content Card */}
-                  <div className="ml-12 sm:ml-0 sm:w-1/2 sm:px-8 w-full">
-                    <div className="glass-card rounded-2xl p-6 group hover:border-cyan-500/40">
-                      <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="w-full pl-8 sm:pl-0 sm:w-1/2 sm:px-8">
+                    <div className="glass-card rounded-2xl p-4 sm:p-6 group hover:border-cyan-500/40">
+                      <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 mb-3">
                         <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-mono font-semibold ${s.badgeColor}`}>
                           {s.badge}
                         </span>
-                        <span className="text-xs font-mono text-slate-400">
+                        <span className="text-[11px] sm:text-xs font-mono text-slate-400">
                           {s.time}
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                      <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
                         {s.title}
                       </h3>
-                      <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                      <p className="mt-1.5 sm:mt-2 text-xs text-slate-400 leading-relaxed">
                         {s.desc}
                       </p>
                     </div>
