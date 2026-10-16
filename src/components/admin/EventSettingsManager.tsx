@@ -205,7 +205,7 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
                 type="url"
                 name="rulebook_url"
                 defaultValue={settings.rulebookUrl}
-                placeholder="https://... or empty for /api-blitz-spec.pdf"
+                placeholder="https://... or empty for /rulebook.pdf"
                 className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono"
               />
               <span className="text-[10px] font-mono text-slate-400 block mt-1">

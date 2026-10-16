@@ -45,7 +45,7 @@ export default function RulebookPage() {
           {/* Quick PDF Action Buttons */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="/api-blitz-spec.pdf"
+              href="/rulebook.pdf"
               download="API-Blitz-2026-Rulebook.pdf"
               className="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono font-bold text-xs px-5 py-2.5 transition-colors shadow-sm"
             >
@@ -53,7 +53,7 @@ export default function RulebookPage() {
               <span>Download Official PDF</span>
             </a>
             <a
-              href="/api-blitz-spec.pdf"
+              href="/rulebook.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-mono text-xs px-4 py-2.5 transition-colors"
@@ -290,7 +290,7 @@ export default function RulebookPage() {
                 <h2 className="text-lg font-bold text-white font-mono">Original PDF Document</h2>
               </div>
               <a
-                href="/api-blitz-spec.pdf"
+                href="/rulebook.pdf"
                 download="API-Blitz-2026-Rulebook.pdf"
                 className="inline-flex items-center gap-2 text-xs font-mono text-sky-400 hover:underline"
               >
@@ -301,7 +301,7 @@ export default function RulebookPage() {
 
             <div className="w-full h-[650px] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
               <iframe
-                src="/api-blitz-spec.pdf"
+                src="/rulebook.pdf"
                 title="API Blitz Official Rulebook"
                 className="w-full h-full border-none"
               />

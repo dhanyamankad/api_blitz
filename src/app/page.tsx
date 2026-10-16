@@ -83,7 +83,7 @@ export default async function Home() {
               )}
 
               <a
-                href={s.rulebookUrl || "/api-blitz-spec.pdf"}
+                href={s.rulebookUrl || "/rulebook.pdf"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-3.5 text-sm font-mono font-medium text-slate-200 hover:border-cyan-400/50 hover:bg-slate-900 transition-all"
