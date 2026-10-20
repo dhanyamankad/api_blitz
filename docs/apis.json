@@ -472,24 +472,24 @@
     "setName": "Set 19",
     "apis": [
       {
-        "docsLink": "https://dog.ceo/dog-api/",
-        "name": "Dog CEO API"
+        "docsLink": "https://api.spaceflightnewsapi.net/v4/docs/",
+        "name": "Spaceflight News API (SNAPI)"
       },
       {
-        "docsLink": "https://catfact.ninja/",
-        "name": "Cat Facts API"
+        "docsLink": "http://api.open-notify.org/",
+        "name": "Open Notify ISS Tracker API"
       },
       {
-        "docsLink": "https://developers.thecatapi.com/",
-        "name": "TheCatAPI"
+        "docsLink": "https://thespacedevs.com/llapi",
+        "name": "Launch Library 2 API"
       },
       {
-        "docsLink": "https://shibe.online/",
-        "name": "Shibe.Online API"
+        "docsLink": "https://api.nasa.gov/",
+        "name": "NASA Open API"
       },
       {
-        "docsLink": "https://randomfox.ca/",
-        "name": "RandomFox API"
+        "docsLink": "https://sunrise-sunset.org/api",
+        "name": "Sunrise-Sunset API"
       }
     ]
   },
