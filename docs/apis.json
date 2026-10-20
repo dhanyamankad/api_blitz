@@ -1,0 +1,522 @@
+[
+  {
+    "setNumber": 1,
+    "setName": "Set 01",
+    "apis": [
+      {
+        "docsLink": "https://www.themealdb.com/api.php",
+        "name": "TheMealDB"
+      },
+      {
+        "docsLink": "https://frankfurter.dev/",
+        "name": "Frankfurter"
+      },
+      {
+        "docsLink": "https://open-meteo.com/en/docs",
+        "name": "Open-Meteo"
+      },
+      {
+        "docsLink": "https://memegen.link/",
+        "name": "Memegen.link"
+      },
+      {
+        "docsLink": "https://discord.com/developers/docs/resources/webhook",
+        "name": "Discord Webhooks"
+      }
+    ]
+  },
+  {
+    "setNumber": 2,
+    "setName": "Set 02",
+    "apis": [
+      {
+        "docsLink": "https://www.tvmaze.com/api",
+        "name": "TVMaze API"
+      },
+      {
+        "docsLink": "https://performance-partners.apple.com/search-api",
+        "name": "iTunes Search API"
+      },
+      {
+        "docsLink": "https://opentdb.com/api_config.php",
+        "name": "Open Trivia DB"
+      },
+      {
+        "docsLink": "https://jokeapi.dev/",
+        "name": "JokeAPI"
+      },
+      {
+        "docsLink": "https://discord.com/developers/docs/resources/webhook",
+        "name": "Discord Webhooks"
+      }
+    ]
+  },
+  {
+    "setNumber": 3,
+    "setName": "Set 03",
+    "apis": [
+      {
+        "docsLink": "https://groq.com/docs/",
+        "name": "Groq Cloud API"
+      },
+      {
+        "docsLink": "https://docs.github.com/en/rest",
+        "name": "GitHub REST API"
+      },
+      {
+        "docsLink": "https://quickchart.io/documentation/",
+        "name": "QuickChart API"
+      },
+      {
+        "docsLink": "https://hn.algolia.com/api",
+        "name": "Hacker News API"
+      },
+      {
+        "docsLink": "https://discord.com/developers/docs/resources/webhook",
+        "name": "Discord Webhooks"
+      }
+    ]
+  },
+  {
+    "setNumber": 4,
+    "setName": "Set 04",
+    "apis": [
+      {
+        "docsLink": "https://docs.coingecko.com/",
+        "name": "CoinGecko API"
+      },
+      {
+        "docsLink": "https://gnews.io/docs/",
+        "name": "GNews API"
+      },
+      {
+        "docsLink": "https://finnhub.io/docs/api",
+        "name": "Finnhub Stock API"
+      },
+      {
+        "docsLink": "https://quickchart.io/documentation/",
+        "name": "QuickChart API"
+      },
+      {
+        "docsLink": "https://discord.com/developers/docs/resources/webhook",
+        "name": "Discord Webhooks"
+      }
+    ]
+  },
+  {
+    "setNumber": 5,
+    "setName": "Set 05",
+    "apis": [
+      {
+        "docsLink": "https://open-meteo.com/en/docs",
+        "name": "Open-Meteo API"
+      },
+      {
+        "docsLink": "https://restcountries.com/",
+        "name": "REST Countries API"
+      },
+      {
+        "docsLink": "https://api.nasa.gov/",
+        "name": "NASA Open API"
+      },
+      {
+        "docsLink": "https://en.wikipedia.org/w/api.php",
+        "name": "Wikipedia API"
+      },
+      {
+        "docsLink": "https://nominatim.org/release-docs/latest/api/Search/",
+        "name": "Nominatim OpenStreetMap API"
+      }
+    ]
+  },
+  {
+    "setNumber": 6,
+    "setName": "Set 06",
+    "apis": [
+      {
+        "docsLink": "https://www.omdbapi.com/",
+        "name": "OMDb API"
+      },
+      {
+        "docsLink": "https://groq.com/docs/",
+        "name": "Groq Cloud API"
+      },
+      {
+        "docsLink": "https://elevenlabs.io/docs/api-reference/",
+        "name": "ElevenLabs API"
+      },
+      {
+        "docsLink": "https://developers.google.com/youtube/v3",
+        "name": "YouTube Data API"
+      },
+      {
+        "docsLink": "https://www.tvmaze.com/api",
+        "name": "TVMaze API"
+      }
+    ]
+  },
+  {
+    "setNumber": 7,
+    "setName": "Set 07",
+    "apis": [
+      {
+        "docsLink": "https://api.citybik.es/v2/",
+        "name": "CityBikes API"
+      },
+      {
+        "docsLink": "https://open-meteo.com/en/docs",
+        "name": "Open-Meteo"
+      },
+      {
+        "docsLink": "https://air-quality-api.open-meteo.com/v1/air-quality",
+        "name": "Open-Meteo Air Quality"
+      },
+      {
+        "docsLink": "https://www.geoapify.com/places-api",
+        "name": "Geoapify Places API"
+      },
+      {
+        "docsLink": "https://core.telegram.org/bots/api",
+        "name": "Telegram Bot API"
+      }
+    ]
+  },
+  {
+    "setNumber": 8,
+    "setName": "Set 08",
+    "apis": [
+      {
+        "docsLink": "https://unsplash.com/developers",
+        "name": "Unsplash API"
+      },
+      {
+        "docsLink": "https://picsum.photos/",
+        "name": "Picsum Photos API"
+      },
+      {
+        "docsLink": "https://api.dicebear.com/",
+        "name": "DiceBear Avatars API"
+      },
+      {
+        "docsLink": "https://cloudinary.com/documentation",
+        "name": "Cloudinary API"
+      },
+      {
+        "docsLink": "https://loremflickr.com/",
+        "name": "LoremFlickr API"
+      }
+    ]
+  },
+  {
+    "setNumber": 9,
+    "setName": "Set 09",
+    "apis": [
+      {
+        "docsLink": "https://docs.github.com/en/rest",
+        "name": "GitHub REST API"
+      },
+      {
+        "docsLink": "https://hn.algolia.com/api",
+        "name": "Hacker News API"
+      },
+      {
+        "docsLink": "https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md",
+        "name": "npm Registry API"
+      },
+      {
+        "docsLink": "https://bundlephobia.com/",
+        "name": "Bundlephobia API"
+      },
+      {
+        "docsLink": "https://dev.to/api/",
+        "name": "Dev.to API"
+      }
+    ]
+  },
+  {
+    "setNumber": 10,
+    "setName": "Set 10",
+    "apis": [
+      {
+        "docsLink": "https://docs.openaq.org/",
+        "name": "OpenAQ Air Quality API"
+      },
+      {
+        "docsLink": "https://api.worldbank.org/v2/country/IND/indicator/EN.ATM.CO2E.KT?format=json",
+        "name": "World Bank Climate API"
+      },
+      {
+        "docsLink": "https://world.openfoodfacts.org/data",
+        "name": "Open Food Facts API"
+      },
+      {
+        "docsLink": "https://open-meteo.com/en/docs",
+        "name": "Open-Meteo Solar & Radiation"
+      },
+      {
+        "docsLink": "https://sunrise-sunset.org/api",
+        "name": "Sunrise-Sunset API"
+      }
+    ]
+  },
+  {
+    "setNumber": 11,
+    "setName": "Set 11",
+    "apis": [
+      {
+        "docsLink": "https://gutendex.com/",
+        "name": "Gutendex API"
+      },
+      {
+        "docsLink": "https://openlibrary.org/developers/api",
+        "name": "Open Library API"
+      },
+      {
+        "docsLink": "https://dictionaryapi.dev/",
+        "name": "Free Dictionary API"
+      },
+      {
+        "docsLink": "https://github.com/thundercomb/poetrydb#readme",
+        "name": "PoetryDB"
+      },
+      {
+        "docsLink": "https://api.artic.edu/docs/",
+        "name": "Art Institute of Chicago API"
+      }
+    ]
+  },
+  {
+    "setNumber": 12,
+    "setName": "Set 12",
+    "apis": [
+      {
+        "docsLink": "https://pokeapi.co",
+        "name": "PokeAPI"
+      },
+      {
+        "docsLink": "https://www.cheapshark.com/api",
+        "name": "CheapShark API"
+      },
+      {
+        "docsLink": "https://www.chess.com/news/view/published-data-api",
+        "name": "Chess.com API"
+      },
+      {
+        "docsLink": "https://opentdb.com/api_config.php",
+        "name": "Open Trivia DB"
+      },
+      {
+        "docsLink": "https://deckofcardsapi.com/",
+        "name": "Deck of Cards API"
+      }
+    ]
+  },
+  {
+    "setNumber": 13,
+    "setName": "Set 13",
+    "apis": [
+      {
+        "docsLink": "https://remotive.com/api-documentation",
+        "name": "Remotive API"
+      },
+      {
+        "docsLink": "https://www.arbeitnow.com/api/job-board-api",
+        "name": "Arbeitnow Job Board API"
+      },
+      {
+        "docsLink": "https://www.frankfurter.app/docs",
+        "name": "Frankfurter API"
+      },
+      {
+        "docsLink": "https://date.nager.at",
+        "name": "Nager.Date API"
+      },
+      {
+        "docsLink": "https://hn.algolia.com/api",
+        "name": "Hacker News API"
+      }
+    ]
+  },
+  {
+    "setNumber": 14,
+    "setName": "Set 14",
+    "apis": [
+      {
+        "docsLink": "https://api.coinpaprika.com",
+        "name": "Coinpaprika API"
+      },
+      {
+        "docsLink": "https://goldprice.dev/docs",
+        "name": "Goldprice.dev API"
+      },
+      {
+        "docsLink": "https://www.frankfurter.app/docs",
+        "name": "Frankfurter API"
+      },
+      {
+        "docsLink": "https://www.econdb.com/api/",
+        "name": "Econdb API"
+      },
+      {
+        "docsLink": "https://hn.algolia.com/api",
+        "name": "Hacker News API"
+      }
+    ]
+  },
+  {
+    "setNumber": 15,
+    "setName": "Set 15",
+    "apis": [
+      {
+        "docsLink": "https://www.thecocktaildb.com/api.php",
+        "name": "TheCocktailDB API"
+      },
+      {
+        "docsLink": "https://world.openfoodfacts.org/data",
+        "name": "Open Food Facts API"
+      },
+      {
+        "docsLink": "https://www.themealdb.com/api.php",
+        "name": "TheMealDB API"
+      },
+      {
+        "docsLink": "https://fruityvice.com/",
+        "name": "Fruityvice API"
+      },
+      {
+        "docsLink": "https://spoonacular.com/food-api/docs",
+        "name": "Spoonacular API"
+      }
+    ]
+  },
+  {
+    "setNumber": 16,
+    "setName": "Set 16",
+    "apis": [
+      {
+        "docsLink": "https://anilist.gitbook.io/",
+        "name": "AniList GraphQL API"
+      },
+      {
+        "docsLink": "https://pokeapi.co/docs/v2",
+        "name": "PokeAPI"
+      },
+      {
+        "docsLink": "https://rickandmortyapi.com",
+        "name": "Rick and Morty API"
+      },
+      {
+        "docsLink": "https://docs.potterdb.com/",
+        "name": "PotterDB"
+      },
+      {
+        "docsLink": "https://ghibliapi.vercel.app/",
+        "name": "Studio Ghibli API"
+      }
+    ]
+  },
+  {
+    "setNumber": 17,
+    "setName": "Set 17",
+    "apis": [
+      {
+        "docsLink": "https://bored-api.appbrewery.com/",
+        "name": "Bored API"
+      },
+      {
+        "docsLink": "https://getpantry.cloud/",
+        "name": "Pantry API"
+      },
+      {
+        "docsLink": "https://quickchart.io/documentation/",
+        "name": "QuickChart API"
+      },
+      {
+        "docsLink": "https://goqr.me/api/",
+        "name": "goQR API"
+      },
+      {
+        "docsLink": "https://date.nager.at",
+        "name": "Nager.Date API"
+      }
+    ]
+  },
+  {
+    "setNumber": 18,
+    "setName": "Set 18",
+    "apis": [
+      {
+        "docsLink": "https://metmuseum.github.io/",
+        "name": "Metropolitan Museum of Art API"
+      },
+      {
+        "docsLink": "https://iconify.design/docs/api/",
+        "name": "Iconify API"
+      },
+      {
+        "docsLink": "https://github.com/cheatsnake/emojihub",
+        "name": "EmojiHub API"
+      },
+      {
+        "docsLink": "https://color.serialif.com/",
+        "name": "Serialif Color API"
+      },
+      {
+        "docsLink": "https://www.thecolorapi.com/",
+        "name": "The Color API"
+      }
+    ]
+  },
+  {
+    "setNumber": 19,
+    "setName": "Set 19",
+    "apis": [
+      {
+        "docsLink": "https://dog.ceo/dog-api/",
+        "name": "Dog CEO API"
+      },
+      {
+        "docsLink": "https://catfact.ninja/",
+        "name": "Cat Facts API"
+      },
+      {
+        "docsLink": "https://developers.thecatapi.com/",
+        "name": "TheCatAPI"
+      },
+      {
+        "docsLink": "https://shibe.online/",
+        "name": "Shibe.Online API"
+      },
+      {
+        "docsLink": "https://randomfox.ca/",
+        "name": "RandomFox API"
+      }
+    ]
+  },
+  {
+    "setNumber": 20,
+    "setName": "Set 20",
+    "apis": [
+      {
+        "docsLink": "https://api.worldbank.org/",
+        "name": "World Bank Open Data"
+      },
+      {
+        "docsLink": "https://restcountries.com/",
+        "name": "REST Countries API"
+      },
+      {
+        "docsLink": "https://www.frankfurter.app/docs",
+        "name": "Frankfurter API"
+      },
+      {
+        "docsLink": "https://date.nager.at",
+        "name": "Nager.Date API"
+      },
+      {
+        "docsLink": "https://www.econdb.com/api/",
+        "name": "Econdb API"
+      }
+    ]
+  }
+]

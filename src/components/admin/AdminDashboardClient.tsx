@@ -34,6 +34,7 @@ interface ApiAssignmentData {
     id: string;
     name: string;
     docsLink: string;
+    setNumber?: number | null;
   };
 }
 
@@ -58,6 +59,7 @@ interface ApiData {
   id: string;
   name: string;
   docsLink: string;
+  setNumber?: number | null;
   assignments: { teamId: string }[];
 }
 

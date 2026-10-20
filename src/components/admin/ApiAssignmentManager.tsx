@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import {
   autoAssignApisAction,
   autoAssignTeamApisAction,
+  allotSetToTeamAction,
+  syncApisFromJsonAction,
   manualAssignApisAction,
   addApiAction,
   deleteApiAction,
@@ -26,12 +28,14 @@ import {
   CheckCircle2,
   X,
   Code2,
+  Boxes,
 } from "lucide-react";
 
 interface ApiData {
   id: string;
   name: string;
   docsLink: string;
+  setNumber?: number | null;
   assignments: { teamId: string }[];
 }
 
@@ -47,7 +51,7 @@ interface TeamData {
   id: string;
   name: string;
   members: TeamMemberData[];
-  assignments: { api: { id: string; name: string; docsLink: string } }[];
+  assignments: { api: { id: string; name: string; docsLink: string; setNumber?: number | null } }[];
 }
 
 interface ApiAssignmentManagerProps {
@@ -73,11 +77,35 @@ export function ApiAssignmentManager({
   } | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
+  // Helper to check if a team is assigned a full pre-defined Set (5 APIs from the same setNumber)
+  const getTeamSetNumber = (team: TeamData): number | null => {
+    if (team.assignments.length !== 5) return null;
+    const firstSet = team.assignments[0]?.api?.setNumber;
+    if (!firstSet) return null;
+    const allSameSet = team.assignments.every(
+      (a) => a.api.setNumber === firstSet
+    );
+    return allSameSet ? firstSet : null;
+  };
+
+  // Map of setNumber (1..20) -> team that currently has it
+  const setAssignedTeamMap = new Map<number, TeamData>();
+  for (const t of approvedTeams) {
+    const sNum = getTeamSetNumber(t);
+    if (sNum) {
+      setAssignedTeamMap.set(sNum, t);
+    }
+  }
+
+  // Pre-defined sets list (1 to 20)
+  const allSetNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
+
   // Filtered APIs for the catalog
   const filteredApis = apis.filter(
     (a) =>
       a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.docsLink.toLowerCase().includes(searchTerm.toLowerCase())
+      a.docsLink.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (a.setNumber && `set ${a.setNumber}`.includes(searchTerm.toLowerCase()))
   );
 
   // Filtered approved teams
@@ -89,11 +117,11 @@ export function ApiAssignmentManager({
     (t) => t.assignments.length < 5
   ).length;
 
-  // Bulk auto-assign across all teams needing APIs
+  // Bulk auto-assign pre-defined Sets across all teams needing APIs
   const handleBulkAutoAssign = () => {
     if (
       !confirm(
-        `Are you sure you want to balance & allot 5 APIs to all ${unassignedTeamsCount} unassigned approved team(s)?`
+        `Are you sure you want to allot pre-defined 5-API sets to all ${unassignedTeamsCount} unassigned approved team(s)?`
       )
     ) {
       return;
@@ -106,13 +134,13 @@ export function ApiAssignmentManager({
       } else {
         setStatusMsg({
           type: "success",
-          text: res.message || "Bulk auto-allotment completed successfully!",
+          text: res.message || "Bulk set allotment completed successfully!",
         });
       }
     });
   };
 
-  // Auto-allot for single team
+  // Auto-allot available Set for single team
   const handleTeamAutoAssign = (teamId: string, teamName: string) => {
     startTransition(async () => {
       setStatusMsg(null);
@@ -122,9 +150,49 @@ export function ApiAssignmentManager({
       } else {
         setStatusMsg({
           type: "success",
-          text: `Allotted 5 balanced APIs to "${teamName}".`,
+          text: res.message || `API set allotted to "${teamName}".`,
         });
         setManualModeTeamId(null);
+      }
+    });
+  };
+
+  // Direct Set allotment (Set 1..20)
+  const handleAllotSet = (teamId: string, setNumber: number, teamName: string) => {
+    startTransition(async () => {
+      setStatusMsg(null);
+      const res = await allotSetToTeamAction(teamId, setNumber);
+      if (res.error) {
+        setStatusMsg({ type: "error", text: res.error });
+      } else {
+        setStatusMsg({
+          type: "success",
+          text: `Set ${setNumber < 10 ? "0" + setNumber : setNumber} (5 APIs) allotted to "${teamName}" successfully!`,
+        });
+        setManualModeTeamId(null);
+      }
+    });
+  };
+
+  // Sync from docs/apis.json
+  const handleSyncFromJson = () => {
+    if (
+      !confirm(
+        "Are you sure you want to re-sync all 100 APIs and 20 sets from docs/apis.json into the database? This will update any edits made to the JSON file."
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      setStatusMsg(null);
+      const res = await syncApisFromJsonAction();
+      if (res.error) {
+        setStatusMsg({ type: "error", text: res.error });
+      } else {
+        setStatusMsg({
+          type: "success",
+          text: res.message || "APIs synced from docs/apis.json successfully!",
+        });
       }
     });
   };
@@ -270,9 +338,19 @@ export function ApiAssignmentManager({
                 className="flex items-center gap-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 px-4 py-2.5 text-xs font-mono font-bold transition-colors shadow-sm"
               >
                 <Sparkles className="h-4 w-4" />
-                <span>Auto-Allot for All {unassignedTeamsCount} Teams</span>
+                <span>Auto-Allot Sets for All {unassignedTeamsCount} Teams</span>
               </button>
             )}
+
+            <button
+              onClick={handleSyncFromJson}
+              disabled={isPending}
+              title="Reload and sync from docs/apis.json"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2.5 text-xs font-mono font-medium transition-colors shadow-sm"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 text-sky-400 ${isPending ? "animate-spin" : ""}`} />
+              <span>Sync from docs/apis.json</span>
+            </button>
           </div>
         </div>
       </div>
@@ -341,6 +419,7 @@ export function ApiAssignmentManager({
               const hasFiveApis = team.assignments.length === 5;
               const isExpanded = expandedTeamId === team.id;
               const isManualMode = manualModeTeamId === team.id;
+              const teamSetNum = getTeamSetNumber(team);
 
               return (
                 <div
@@ -366,17 +445,19 @@ export function ApiAssignmentManager({
                         <span className="font-bold text-white text-base">
                           {team.name}
                         </span>
-                        <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                            hasFiveApis
-                              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                              : "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                          }`}
-                        >
-                          {hasFiveApis
-                            ? "✅ 5 / 5 APIs ALLOTTED"
-                            : `⚠️ ${team.assignments.length} / 5 APIs ALLOTTED`}
-                        </span>
+                        {teamSetNum ? (
+                          <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-semibold">
+                            ✅ SET {teamSetNum < 10 ? "0" + teamSetNum : teamSetNum} (5 APIS ALLOTTED)
+                          </span>
+                        ) : hasFiveApis ? (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 font-semibold">
+                            ✅ 5 APIS ALLOTTED
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400">
+                            ⚠️ {team.assignments.length} / 5 APIS ALLOTTED
+                          </span>
+                        )}
                       </div>
                       <div className="text-[11px] font-mono text-slate-400 flex flex-wrap gap-x-3 gap-y-1">
                         {team.members.map((m) => (
@@ -404,18 +485,22 @@ export function ApiAssignmentManager({
                   {/* Expanded Card Body: View Allotted APIs or Allot Options */}
                   {isExpanded && (
                     <div className="border-t border-slate-800/80 p-4 sm:p-6 bg-slate-950/50 space-y-5 rounded-b-2xl">
-                      {/* Case 1: 5 APIs Are Allotted */}
-                      {hasFiveApis && !isManualMode && (
-                        <div className="space-y-4">
+                      {/* Allotted APIs List */}
+                      {hasFiveApis && (
+                        <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-400 uppercase tracking-wide">
                               <CheckCircle2 className="h-4 w-4" />
-                              <span>5 APIs Allotted to this Squad</span>
+                              <span>
+                                {teamSetNum
+                                  ? `Set ${teamSetNum < 10 ? "0" + teamSetNum : teamSetNum} (5 APIs Allotted)`
+                                  : "5 APIs Allotted to this Squad"}
+                              </span>
                             </div>
 
                             <button
                               onClick={() => {
-                                setManualModeTeamId(team.id);
+                                setManualModeTeamId(isManualMode ? null : team.id);
                                 setSelectedApiIds(
                                   team.assignments.map((a) => a.api.id)
                                 );
@@ -423,7 +508,7 @@ export function ApiAssignmentManager({
                               className="text-xs font-mono text-sky-400 hover:text-sky-300 flex items-center gap-1"
                             >
                               <RefreshCw className="h-3 w-3" />
-                              <span>Change / Re-Allot</span>
+                              <span>{isManualMode ? "Close Custom Pick" : "Custom 5-API Pick"}</span>
                             </button>
                           </div>
 
@@ -434,9 +519,12 @@ export function ApiAssignmentManager({
                                 className="rounded-xl border border-slate-800 bg-slate-900/80 p-3.5 flex flex-col justify-between"
                               >
                                 <div>
-                                  <span className="text-[10px] font-mono text-slate-500 uppercase block mb-1">
-                                    API 0{i + 1}
-                                  </span>
+                                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 uppercase mb-1">
+                                    <span>API 0{i + 1}</span>
+                                    {asgn.api.setNumber && (
+                                      <span className="text-slate-400">Set {asgn.api.setNumber < 10 ? "0" + asgn.api.setNumber : asgn.api.setNumber}</span>
+                                    )}
+                                  </div>
                                   <h4 className="font-bold text-white text-xs leading-tight mb-2">
                                     {asgn.api.name}
                                   </h4>
@@ -456,61 +544,84 @@ export function ApiAssignmentManager({
                         </div>
                       )}
 
-                      {/* Case 2: APIs Not Allotted (< 5) OR in Re-allot Mode */}
-                      {(!hasFiveApis || isManualMode) && (
-                        <div className="space-y-4">
-                          <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div>
-                              <div className="text-xs font-mono font-bold text-amber-400 flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                <span>
-                                  {hasFiveApis
-                                    ? "Re-Allotting APIs for Squad"
-                                    : "Squad Awaiting API Allotment (0 / 5 Assigned)"}
-                                </span>
-                              </div>
-                              <p className="text-[11px] font-mono text-slate-400 mt-1">
-                                Choose 1-Click Auto-Allot to automatically balance with the lowest-used APIs, or manually pick 5 APIs.
-                              </p>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button
-                                onClick={() =>
-                                  handleTeamAutoAssign(team.id, team.name)
-                                }
-                                disabled={isPending || apis.length < 5}
-                                className="flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 px-3.5 py-2 text-xs font-mono font-bold transition-colors"
-                              >
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span>1-Click Auto-Allot 5 APIs</span>
-                              </button>
-
-                              {!isManualMode ? (
-                                <button
-                                  onClick={() => {
-                                    setManualModeTeamId(team.id);
-                                    setSelectedApiIds(
-                                      team.assignments.map((a) => a.api.id)
-                                    );
-                                  }}
-                                  className="rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3 py-2 text-xs font-mono text-slate-200"
-                                >
-                                  Manual Pick
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => setManualModeTeamId(null)}
-                                  className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-mono text-slate-400 hover:text-white"
-                                >
-                                  Cancel
-                                </button>
-                              )}
-                            </div>
+                      {/* DIRECT SET ALLOTMENT SECTION (20 PRE-DEFINED SETS) */}
+                      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+                          <div>
+                            <h4 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                              <Boxes className="h-3.5 w-3.5 text-sky-400" />
+                              <span>Allot Pre-Defined Set Directly (20 Sets Available)</span>
+                            </h4>
+                            <p className="text-[11px] font-mono text-slate-400 mt-0.5">
+                              Click any set button below to allot all 5 APIs of that set directly to {team.name}.
+                            </p>
                           </div>
 
-                          {/* Manual Selection Grid */}
-                          {isManualMode && (
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => handleTeamAutoAssign(team.id, team.name)}
+                              disabled={isPending || apis.length < 5}
+                              className="flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 px-3 py-1.5 text-xs font-mono font-bold transition-colors"
+                            >
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span>Auto-Allot Next Set</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 20 Sets Pills Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 pt-1">
+                          {allSetNumbers.map((sNum) => {
+                            const isCurrentTeamSet = teamSetNum === sNum;
+                            const otherTeam = setAssignedTeamMap.get(sNum);
+                            const isTakenByOther = otherTeam && otherTeam.id !== team.id;
+
+                            return (
+                              <button
+                                key={sNum}
+                                type="button"
+                                onClick={() => handleAllotSet(team.id, sNum, team.name)}
+                                disabled={isPending}
+                                className={`flex flex-col items-start p-2 rounded-lg border text-left transition-all ${
+                                  isCurrentTeamSet
+                                    ? "border-emerald-500 bg-emerald-950/40 text-emerald-300 ring-1 ring-emerald-500/50"
+                                    : isTakenByOther
+                                    ? "border-slate-800/80 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                                    : "border-sky-500/30 bg-sky-950/20 text-sky-300 hover:border-sky-500 hover:bg-sky-950/40"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="font-mono text-xs font-bold">
+                                    Set {sNum < 10 ? "0" + sNum : sNum}
+                                  </span>
+                                  {isCurrentTeamSet && (
+                                    <span className="text-[9px] font-mono uppercase bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-1 rounded">
+                                      Allotted
+                                    </span>
+                                  )}
+                                  {!isCurrentTeamSet && !isTakenByOther && (
+                                    <span className="text-[9px] font-mono uppercase bg-sky-500/20 text-sky-300 px-1 rounded">
+                                      Available
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[10px] font-mono text-slate-400 truncate w-full mt-0.5">
+                                  {isTakenByOther ? (
+                                    <span className="text-amber-400/80 truncate block" title={`Assigned to ${otherTeam.name}`}>
+                                      → {otherTeam.name}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400">5 curated APIs</span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Manual Fallback Selection Grid */}
+                      {isManualMode && (
                             <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-4 space-y-3">
                               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                                 <span className="text-xs font-mono font-bold text-white uppercase">
@@ -567,10 +678,8 @@ export function ApiAssignmentManager({
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
           </div>
         )}
       </div>
@@ -711,7 +820,9 @@ export function ApiAssignmentManager({
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-900 flex items-center justify-between text-[10px] font-mono text-slate-500">
-                  <span>Assigned Count</span>
+                  <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-slate-300 font-semibold">
+                    Set {api.setNumber ? (api.setNumber < 10 ? "0" + api.setNumber : api.setNumber) : "—"}
+                  </span>
                   <span className="rounded bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 text-sky-400 font-semibold">
                     {api.assignments.length} squads
                   </span>

@@ -36,7 +36,7 @@ export default async function AdminPage() {
       },
     }),
     prisma.api.findMany({
-      orderBy: { name: "asc" },
+      orderBy: [{ setNumber: "asc" }, { name: "asc" }],
       include: {
         assignments: {
           select: { teamId: true },

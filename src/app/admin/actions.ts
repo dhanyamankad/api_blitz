@@ -1,5 +1,7 @@
 "use server";
 
+import fs from "fs";
+import path from "path";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -65,13 +67,13 @@ export async function rejectTeamAction(teamId: string): Promise<AdminActionState
 }
 
 /**
- * Auto-assign 5 balanced APIs to all approved teams that do not have 5 assigned APIs.
+ * Auto-assign pre-defined Sets (5 APIs each) across all approved teams that need APIs.
+ * Automatically distributes available and least-used sets.
  */
 export async function autoAssignApisAction(): Promise<AdminActionState> {
   await verifyAdmin();
 
   try {
-    // 1. Fetch all approved teams and their current assignments
     const approvedTeams = await prisma.team.findMany({
       where: { status: "approved" },
       include: { assignments: true },
@@ -82,7 +84,6 @@ export async function autoAssignApisAction(): Promise<AdminActionState> {
       return { success: true, message: "All approved teams already have their APIs assigned." };
     }
 
-    // 2. Fetch all available APIs
     const allApis = await prisma.api.findMany({
       include: { assignments: true },
     });
@@ -93,40 +94,36 @@ export async function autoAssignApisAction(): Promise<AdminActionState> {
       };
     }
 
-    // Sort APIs by lowest assignment count to balance variety
-    let apiPoolWithCounts = allApis.map((api) => ({
-      id: api.id,
-      count: api.assignments.length,
-    }));
+    // Group APIs by setNumber
+    const setsMap = new Map<number, typeof allApis>();
+    for (const api of allApis) {
+      const sNum = api.setNumber ?? 1;
+      if (!setsMap.has(sNum)) setsMap.set(sNum, []);
+      setsMap.get(sNum)!.push(api);
+    }
+
+    const setStats = Array.from(setsMap.entries()).map(([setNum, apis]) => {
+      const assignmentCount = apis.reduce((acc, a) => acc + a.assignments.length, 0);
+      return { setNum, apis, count: assignmentCount };
+    });
 
     await prisma.$transaction(async (tx) => {
       for (const team of teamsNeedingApis) {
-        // Clear any partial assignments
-        await tx.apiAssignment.deleteMany({
-          where: { teamId: team.id },
-        });
+        await tx.apiAssignment.deleteMany({ where: { teamId: team.id } });
 
-        // Sort by current assignment count ascending + shuffle among equal counts
-        apiPoolWithCounts.sort((a, b) => {
+        // Sort by lowest assignment count with random tiebreaker
+        setStats.sort((a, b) => {
           if (a.count === b.count) return Math.random() - 0.5;
           return a.count - b.count;
         });
 
-        // Pick top 5
-        const chosen = apiPoolWithCounts.slice(0, 5);
-
-        // Assign to team
+        const chosen = setStats[0];
         await tx.apiAssignment.createMany({
-          data: chosen.map((c) => ({
-            teamId: team.id,
-            apiId: c.id,
-          })),
+          data: chosen.apis.map((a) => ({ teamId: team.id, apiId: a.id })),
         });
 
-        // Increment local counts
-        for (const c of chosen) {
-          c.count += 1;
-        }
+        // Increment count so subsequent teams get distinct sets
+        chosen.count += chosen.apis.length;
       }
     });
 
@@ -134,10 +131,10 @@ export async function autoAssignApisAction(): Promise<AdminActionState> {
     revalidatePath("/dashboard");
     return {
       success: true,
-      message: `Successfully allotted 5 balanced APIs to ${teamsNeedingApis.length} team(s).`,
+      message: `Successfully allotted pre-defined API sets to ${teamsNeedingApis.length} team(s).`,
     };
   } catch (err: unknown) {
-    return { error: err instanceof Error ? err.message : "Failed to auto-assign APIs." };
+    return { error: err instanceof Error ? err.message : "Failed to auto-assign API sets." };
   }
 }
 
@@ -218,7 +215,43 @@ export async function deleteApiAction(apiId: string): Promise<AdminActionState> 
 }
 
 /**
- * Auto-assign 5 balanced APIs to a single specific team.
+ * Allot an entire pre-defined Set (5 APIs) directly to a single team.
+ */
+export async function allotSetToTeamAction(
+  teamId: string,
+  setNumber: number
+): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    const setApis = await prisma.api.findMany({
+      where: { setNumber },
+    });
+
+    if (setApis.length === 0) {
+      return { error: `No APIs found in Set ${setNumber}.` };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.apiAssignment.deleteMany({ where: { teamId } });
+      await tx.apiAssignment.createMany({
+        data: setApis.map((a) => ({ teamId, apiId: a.id })),
+      });
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      message: `Set ${setNumber} (${setApis.length} APIs) allotted to squad successfully!`,
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to allot Set to squad." };
+  }
+}
+
+/**
+ * Auto-assign an available / least-used Set of 5 APIs to a single specific team.
  */
 export async function autoAssignTeamApisAction(teamId: string): Promise<AdminActionState> {
   await verifyAdmin();
@@ -234,28 +267,90 @@ export async function autoAssignTeamApisAction(teamId: string): Promise<AdminAct
       };
     }
 
-    // Sort APIs by lowest assignment count to balance variety + tiebreak shuffle
-    const sorted = allApis
-      .map((api) => ({ id: api.id, count: api.assignments.length }))
-      .sort((a, b) => {
-        if (a.count === b.count) return Math.random() - 0.5;
-        return a.count - b.count;
-      });
+    // Group APIs by setNumber
+    const setsMap = new Map<number, typeof allApis>();
+    for (const api of allApis) {
+      const sNum = api.setNumber ?? 1;
+      if (!setsMap.has(sNum)) setsMap.set(sNum, []);
+      setsMap.get(sNum)!.push(api);
+    }
 
-    const chosen = sorted.slice(0, 5);
+    // Determine usage of each set
+    const setStats = Array.from(setsMap.entries()).map(([setNum, apis]) => {
+      const assignmentCount = apis.reduce((acc, a) => acc + a.assignments.length, 0);
+      return { setNum, apis, count: assignmentCount };
+    });
+
+    // Sort by lowest assignment count + random tiebreak
+    setStats.sort((a, b) => {
+      if (a.count === b.count) return Math.random() - 0.5;
+      return a.count - b.count;
+    });
+
+    const chosen = setStats[0];
+    if (!chosen || chosen.apis.length === 0) {
+      return { error: "No API sets available." };
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.apiAssignment.deleteMany({ where: { teamId } });
       await tx.apiAssignment.createMany({
-        data: chosen.map((c) => ({ teamId, apiId: c.id })),
+        data: chosen.apis.map((a) => ({ teamId, apiId: a.id })),
       });
     });
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
-    return { success: true, message: "5 balanced APIs allotted to squad successfully." };
+    return {
+      success: true,
+      message: `Set ${chosen.setNum} (5 APIs) allotted to squad successfully.`,
+    };
   } catch (err: unknown) {
-    return { error: err instanceof Error ? err.message : "Failed to allot APIs to team." };
+    return { error: err instanceof Error ? err.message : "Failed to allot Set to team." };
+  }
+}
+
+/**
+ * Re-sync all APIs in the database from docs/apis.json file.
+ */
+export async function syncApisFromJsonAction(): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    const jsonPath = path.join(process.cwd(), "docs", "apis.json");
+    if (!fs.existsSync(jsonPath)) {
+      return { error: "docs/apis.json file not found." };
+    }
+
+    const sets = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+    let inserted = 0;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.apiAssignment.deleteMany();
+      await tx.api.deleteMany();
+
+      for (const s of sets) {
+        for (const a of s.apis) {
+          await tx.api.create({
+            data: {
+              name: a.name,
+              docsLink: a.docsLink,
+              setNumber: s.setNumber,
+            },
+          });
+          inserted++;
+        }
+      }
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      message: `Synced ${inserted} APIs across ${sets.length} sets from docs/apis.json into database!`,
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to sync APIs from JSON." };
   }
 }
 
