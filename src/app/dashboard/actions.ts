@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getSettings, siteNow, areSubmissionsOpen } from "@/lib/settings";
 import { isDauEmail, isGithubRepoUrl, isYoutubeUrl, normalizeEmail } from "@/lib/validation";
 import { Prisma } from "@prisma/client";
+import { sendNewRegistrationNotification } from "@/lib/email";
 
 export type ActionState = {
   success?: boolean;
@@ -129,6 +130,15 @@ export async function registerTeamAction(
           },
         ],
       });
+    });
+
+    // Asynchronous organizer notification (fire-and-forget, never delays or breaks registration)
+    void sendNewRegistrationNotification({
+      teamName,
+      leaderName,
+      leaderEmail,
+      memberName,
+      memberEmail,
     });
 
     revalidatePath("/dashboard");
