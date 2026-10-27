@@ -79,6 +79,7 @@ interface AdminDashboardClientProps {
     nowOverride: Date | null;
     submissionsUnlocked?: boolean;
     apisPublished?: boolean;
+    registrationsLocked?: boolean;
   };
   adminEmail?: string;
 }

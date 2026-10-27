@@ -126,10 +126,10 @@ export function EventOverview({ rulebookUrl }: EventOverviewProps) {
               <span>View Rulebook</span>
             </Link>
             <Link
-              href="/login"
+              href="/dashboard"
               className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 sm:py-2.5 text-xs font-mono font-bold text-slate-950 hover:brightness-110 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all active:scale-[0.98]"
             >
-              <span>Register Squad</span>
+              <span>Participant Portal</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

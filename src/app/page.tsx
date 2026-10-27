@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, Terminal, FileText, Users, ShieldAlert, Zap, MessageSquare } from "lucide-react";
+import { ArrowRight, Sparkles, Terminal, FileText, Users, ShieldAlert, Zap, MessageSquare, MapPin, Lock } from "lucide-react";
 import { getSettings, eventPhase } from "@/lib/settings";
 import { auth } from "@/auth";
 import { Navbar } from "@/components/Navbar";
@@ -38,7 +38,7 @@ export default async function Home() {
         <section className="relative pt-14 pb-16 sm:pt-20 sm:pb-24 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
             {/* Sponsor & Organizer Banner: NEON x MSTC */}
-            <div className="inline-flex items-center gap-3 sm:gap-4 rounded-full border border-slate-800/80 bg-slate-900/90 px-4 sm:px-6 py-2 sm:py-2.5 backdrop-blur-md mb-8 shadow-xl hover:border-slate-700 transition-all">
+            <div className="inline-flex items-center gap-3 sm:gap-4 rounded-full border border-slate-800/80 bg-slate-900/90 px-4 sm:px-6 py-2 sm:py-2.5 backdrop-blur-md mb-6 shadow-xl hover:border-slate-700 transition-all">
               <div className="flex items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -62,6 +62,21 @@ export default async function Home() {
               </div>
             </div>
 
+            {/* Venue & Registration Status Pill Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-4 py-1.5 text-xs font-mono font-semibold text-rose-300 backdrop-blur-md shadow-lg shadow-rose-500/10">
+                <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                <span>VENUE: CEP 102</span>
+                <span className="text-rose-500/50">·</span>
+                <span className="text-slate-300">DHIRUBHAI AMBANI UNIVERSITY</span>
+              </div>
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 text-xs font-mono font-semibold text-amber-300 backdrop-blur-md">
+                <Lock className="h-3.5 w-3.5 text-amber-400" />
+                <span>REGISTRATIONS CLOSED (31 SQUADS)</span>
+              </div>
+            </div>
+
             {/* Main Headline */}
             <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1]">
               2 HACKERS. <br className="hidden sm:inline" />
@@ -70,8 +85,7 @@ export default async function Home() {
 
             {/* Subtitle */}
             <p className="mt-6 max-w-2xl text-base sm:text-lg text-slate-300 leading-relaxed font-normal">
-              API Blitz is the flagship 2-person engineering sprint at Dhirubhai Ambani University.
-              Form your duo, receive your secret API bundle at kickoff, and push your limits.
+              API Blitz is the flagship 2-person engineering sprint at Dhirubhai Ambani University, taking place live at <strong className="text-white font-semibold">CEP 102</strong>. Form your duo, receive your secret API bundle at kickoff, and push your limits.
             </p>
 
             {/* CTAs */}
@@ -91,7 +105,7 @@ export default async function Home() {
                   className="flex items-center justify-center gap-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 px-6 py-3.5 text-sm font-mono font-bold text-slate-950 transition-colors shadow-sm"
                 >
                   <Terminal className="h-4 w-4" />
-                  <span>Sign In with @dau.ac.in</span>
+                  <span>Sign In to Participant Portal</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               )}
@@ -105,8 +119,24 @@ export default async function Home() {
               </Link>
             </div>
 
+            {/* Quick Event Badges */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 text-xs font-mono text-slate-400">
+              <div className="flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-rose-300">
+                <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                <span>Venue: <strong className="font-bold text-white">CEP 102</strong></span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5">
+                <Users className="h-3.5 w-3.5 text-sky-400" />
+                <span>2 Hackers / Squad</span>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-1.5">
+                <Zap className="h-3.5 w-3.5 text-amber-400" />
+                <span>6 Hours Sprint</span>
+              </div>
+            </div>
+
             {/* Dynamic Countdown Section */}
-            <div className="mt-16 w-full">
+            <div className="mt-14 w-full">
               <Countdown targetDate={targetDate} phase={phase} />
             </div>
           </div>
@@ -128,6 +158,10 @@ export default async function Home() {
 
             <div className="grid gap-4 sm:gap-6">
               {[
+                {
+                  q: "Where is the event taking place?",
+                  a: "The hackathon takes place offline on-campus at CEP 102, Dhirubhai Ambani University. All registered squads should report to CEP 102 before 7:00 PM with their laptops and chargers.",
+                },
                 {
                   q: "Who is eligible to participate?",
                   a: "Any student with an active @dau.ac.in Google account is eligible. Both undergraduate and postgraduate students can participate.",

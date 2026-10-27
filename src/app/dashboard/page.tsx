@@ -5,6 +5,7 @@ import { getSettings, eventPhase, areSubmissionsOpen, areApisPublished } from "@
 import { normalizeEmail } from "@/lib/validation";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { RegistrationForm } from "@/components/dashboard/RegistrationForm";
+import { RegistrationsClosedScreen } from "@/components/dashboard/RegistrationsClosedScreen";
 import { PendingScreen } from "@/components/dashboard/PendingScreen";
 import { ApprovedDashboard } from "@/components/dashboard/ApprovedDashboard";
 import { RejectedScreen } from "@/components/dashboard/RejectedScreen";
@@ -58,14 +59,21 @@ export default async function DashboardPage() {
       />
 
       <main className="flex-1 px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        {/* State 1: Unregistered Participant -> Show Registration Form */}
+        {/* State 1: Unregistered Participant -> Show Registration Form if open, else Closed Screen */}
         {!membership && (
-          <RegistrationForm
-            leader={{
-              name: session.user.name || email,
-              email,
-            }}
-          />
+          s.registrationsLocked ? (
+            <RegistrationsClosedScreen
+              userEmail={email}
+              userName={session.user.name}
+            />
+          ) : (
+            <RegistrationForm
+              leader={{
+                name: session.user.name || email,
+                email,
+              }}
+            />
+          )
         )}
 
         {/* State 2: Team Pending Approval -> Status Screen with Leader Edit Controls */}

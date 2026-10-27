@@ -13,6 +13,7 @@ export type EventSettings = {
   nowOverride: Date | null;
   submissionsUnlocked: boolean;
   apisPublished: boolean;
+  registrationsLocked: boolean;
 };
 
 const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : null);
@@ -43,6 +44,7 @@ export const getSettings = cache(async (): Promise<EventSettings> => {
     nowOverride: toDate(map.now_override),
     submissionsUnlocked: map.submissions_unlocked === "true",
     apisPublished: map.apis_published === "true",
+    registrationsLocked: map.registrations_locked !== "false", // locked by default as deadline is over
   };
 });
 
@@ -58,6 +60,11 @@ export function eventPhase(s: EventSettings): Phase {
   if (s.eventStartAt && now < s.eventStartAt.getTime()) return "before_start";
   if (s.submissionDeadline && now >= s.submissionDeadline.getTime()) return "ended";
   return "live";
+}
+
+/** Whether team registrations are currently open. */
+export function areRegistrationsOpen(s: EventSettings): boolean {
+  return !s.registrationsLocked;
 }
 
 /** Submissions are only open if explicitly unlocked by admin AND deadline has not passed. */
@@ -78,3 +85,4 @@ export function daysUntil(target: Date | null, s: EventSettings): number | null 
   if (!target) return null;
   return Math.max(0, Math.ceil((target.getTime() - siteNow(s).getTime()) / 86_400_000));
 }
+

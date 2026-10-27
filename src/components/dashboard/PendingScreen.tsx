@@ -2,7 +2,7 @@
 
 import { useState, useActionState } from "react";
 import { editTeamAction, ActionState } from "@/app/dashboard/actions";
-import { Clock, ShieldAlert, Edit3, X, User, Users, Check, AlertCircle } from "lucide-react";
+import { Clock, ShieldAlert, Edit3, X, User, Users, Check, AlertCircle, MapPin } from "lucide-react";
 
 interface TeamMemberData {
   id: string;
@@ -64,9 +64,15 @@ export function PendingScreen({ team, currentUserEmail }: PendingScreenProps) {
         {/* Status Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-mono font-medium text-amber-400 mb-2">
-              <Clock className="h-3.5 w-3.5" />
-              <span>UNDER REVIEW BY ORGANIZERS</span>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-mono font-medium text-amber-400">
+                <Clock className="h-3.5 w-3.5" />
+                <span>UNDER REVIEW BY ORGANIZERS</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-mono font-medium text-rose-300">
+                <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                <span>VENUE: CEP 102</span>
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {team.name}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
-import { MessageCircle, LogOut, ArrowLeft, Shield } from "lucide-react";
+import { MessageCircle, LogOut, ArrowLeft, Shield, MapPin } from "lucide-react";
 
 interface DashboardHeaderProps {
   user: {
@@ -25,11 +25,15 @@ export function DashboardHeader({ user, whatsappUrl }: DashboardHeaderProps) {
             <span className="hidden sm:inline">Home</span>
           </Link>
           <div className="h-4 w-px bg-slate-800" />
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.png" alt="MSTC Logo" className="h-6 w-auto object-contain" />
             <span className="font-mono text-xs font-bold text-white tracking-wider">
               PORTAL
+            </span>
+            <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[10px] font-mono font-medium text-rose-300">
+              <MapPin className="h-2.5 w-2.5 text-rose-400" />
+              <span>CEP 102</span>
             </span>
           </Link>
         </div>

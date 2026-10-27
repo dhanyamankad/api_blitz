@@ -34,6 +34,7 @@ interface EventSettingsManagerProps {
     nowOverride: Date | null;
     submissionsUnlocked?: boolean;
     apisPublished?: boolean;
+    registrationsLocked?: boolean;
   };
 }
 
@@ -240,6 +241,43 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
                   className="sr-only peer"
                 />
                 <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+          </div>
+
+          {/* Registration Lock Toggle */}
+          <div className="rounded-xl border border-amber-500/30 bg-amber-950/10 p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Lock className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs font-mono font-bold text-white tracking-wide uppercase">
+                    Registration Lock (Deadline Over)
+                  </span>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                      settings.registrationsLocked
+                        ? "border-red-500/30 bg-red-500/10 text-red-300"
+                        : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                    }`}
+                  >
+                    {settings.registrationsLocked ? "LOCKED (CLOSED)" : "OPEN (ACCEPTING TEAMS)"}
+                  </span>
+                </div>
+                <p className="text-[11px] font-mono text-slate-400 leading-relaxed max-w-xl">
+                  When locked, new team registrations are disabled across the public platform and unregistered users see a deadline closed screen. Keep this locked as the registration deadline has concluded.
+                </p>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  name="registrations_locked"
+                  value="true"
+                  defaultChecked={settings.registrationsLocked}
+                  className="sr-only peer"
+                />
+                <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
             </div>
           </div>

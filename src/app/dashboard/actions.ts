@@ -33,6 +33,13 @@ export async function registerTeamAction(
     return { error: "User account could not be found. Please log in again." };
   }
 
+  const settings = await getSettings();
+  if (settings.registrationsLocked) {
+    return {
+      error: "Registration deadline is over. Registrations for API Blitz 2026 are officially closed.",
+    };
+  }
+
   const leaderNameRaw = (formData.get("leaderName") as string) || "";
   const teamNameRaw = (formData.get("teamName") as string) || "";
   const memberNameRaw = (formData.get("memberName") as string) || "";

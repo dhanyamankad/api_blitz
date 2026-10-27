@@ -414,6 +414,9 @@ export async function updateSettingsAction(
   const apisPublished =
     formData.get("apis_published") === "true" ||
     formData.get("apis_published") === "on";
+  const registrationsLocked =
+    formData.get("registrations_locked") === "true" ||
+    formData.get("registrations_locked") === "on";
 
   const removeRulebookFile = formData.get("remove_rulebook_file") === "true";
   const rulebookFile = formData.get("rulebook_file") as File | null;
@@ -424,6 +427,7 @@ export async function updateSettingsAction(
     rulebook_url: rulebookUrl,
     submissions_unlocked: submissionsUnlocked ? "true" : "false",
     apis_published: apisPublished ? "true" : "false",
+    registrations_locked: registrationsLocked ? "true" : "false",
   };
 
   if (removeRulebookFile) {

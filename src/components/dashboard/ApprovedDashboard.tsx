@@ -16,6 +16,7 @@ import {
   Users,
   Video,
   Zap,
+  MapPin,
 } from "lucide-react";
 
 interface ApiData {
@@ -93,6 +94,10 @@ export function ApprovedDashboard({
                 <Zap className="h-3.5 w-3.5" />
                 <span>6 HOUR SPRINT</span>
               </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-mono font-medium text-rose-300">
+                <MapPin className="h-3.5 w-3.5 text-rose-400" />
+                <span>VENUE: CEP 102</span>
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {team.name}
@@ -169,6 +174,39 @@ export function ApprovedDashboard({
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Venue & Event Logistics Banner */}
+      <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-r from-rose-950/20 via-slate-900/60 to-slate-900/80 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg backdrop-blur-md">
+        <div className="flex items-start gap-3.5">
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 shrink-0">
+            <MapPin className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-rose-300 font-semibold">
+                Official In-Person Venue
+              </span>
+              <span className="rounded bg-rose-500/20 text-rose-200 text-[10px] font-mono px-1.5 py-0.2 font-bold">
+                OFFLINE SPRINT
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-white font-mono mt-0.5">
+              CEP 102 <span className="text-slate-400 text-xs font-normal">· Dhirubhai Ambani University</span>
+            </h3>
+            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+              All team members must report in-person to <b className="text-white">CEP 102</b> before the 7:00 PM kickoff. Bring your laptops, chargers, and student ID cards.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:items-end gap-1 shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+          <span className="text-[10px] font-mono text-slate-400 uppercase">Kickoff Time</span>
+          <span className="text-xs font-mono font-bold text-sky-400 flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5" />
+            <span>Today · 7:00 PM IST</span>
+          </span>
         </div>
       </div>
 

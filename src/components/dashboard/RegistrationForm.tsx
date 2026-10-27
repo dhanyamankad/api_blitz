@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { registerTeamAction, ActionState } from "@/app/dashboard/actions";
-import { Users, AlertCircle, CheckCircle2, ArrowRight, ShieldCheck, User } from "lucide-react";
+import { Users, AlertCircle, CheckCircle2, ArrowRight, ShieldCheck, User, MapPin } from "lucide-react";
 
 interface RegistrationFormProps {
   leader: {
@@ -22,9 +22,15 @@ export function RegistrationForm({ leader }: RegistrationFormProps) {
       <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-8 backdrop-blur-md shadow-xl">
         {/* Header */}
         <div className="border-b border-slate-800 pb-6 mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-mono font-medium text-sky-300 mb-3">
-            <Users className="h-3.5 w-3.5" />
-            <span>SQUAD REGISTRATION</span>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-mono font-medium text-sky-300">
+              <Users className="h-3.5 w-3.5" />
+              <span>SQUAD REGISTRATION</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-mono font-medium text-rose-300">
+              <MapPin className="h-3.5 w-3.5 text-rose-400" />
+              <span>VENUE: CEP 102</span>
+            </div>
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">
             Register Your 2-Person Team
