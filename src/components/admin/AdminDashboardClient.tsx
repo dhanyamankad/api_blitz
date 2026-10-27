@@ -19,6 +19,7 @@ import { ApprovalQueue } from "./ApprovalQueue";
 import { ApiAssignmentManager } from "./ApiAssignmentManager";
 import { SubmissionsManager } from "./SubmissionsManager";
 import { EventSettingsManager } from "./EventSettingsManager";
+import { ExportPdfButton } from "./ExportPdfButton";
 
 interface TeamMemberData {
   id: string;
@@ -29,7 +30,7 @@ interface TeamMemberData {
 }
 
 interface ApiAssignmentData {
-  id: string;
+  id?: string;
   api: {
     id: string;
     name: string;
@@ -79,11 +80,12 @@ interface AdminDashboardClientProps {
     submissionsUnlocked?: boolean;
     apisPublished?: boolean;
   };
+  adminEmail?: string;
 }
 
 type TabType = "queue" | "apis" | "submissions" | "settings";
 
-export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardClientProps) {
+export function AdminDashboardClient({ teams, apis, settings, adminEmail }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>("queue");
   const router = useRouter();
   const [isSyncing, startSync] = useTransition();
@@ -265,14 +267,21 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
           })}
         </div>
 
-        {/* Real-time synchronization indicator & action */}
-        <div className="flex items-center gap-2.5 pb-2 sm:pb-0 px-2 sm:px-0 self-end sm:self-auto">
+        {/* Action buttons: PDF Export & Live Sync */}
+        <div className="flex flex-wrap items-center gap-2.5 pb-2 sm:pb-0 px-2 sm:px-0 self-end sm:self-auto">
+          <ExportPdfButton
+            teams={teams}
+            adminEmail={adminEmail}
+            variant="primary"
+          />
+
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-mono text-emerald-400">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>LIVE SYNC ACTIVE</span>
+            <span className="hidden sm:inline">LIVE SYNC ACTIVE</span>
+            <span className="sm:hidden">LIVE</span>
           </div>
 
           <button
@@ -282,7 +291,7 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
             className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-3 w-3 ${isSyncing ? "animate-spin text-sky-400" : ""}`} />
-            <span>{isSyncing ? "Syncing..." : "Sync Now"}</span>
+            <span>{isSyncing ? "Syncing..." : "Sync"}</span>
           </button>
         </div>
       </div>
@@ -302,7 +311,7 @@ export function AdminDashboardClient({ teams, apis, settings }: AdminDashboardCl
         )}
 
         {activeTab === "submissions" && (
-          <SubmissionsManager teams={teams} />
+          <SubmissionsManager teams={teams} adminEmail={adminEmail} />
         )}
 
         {activeTab === "settings" && (

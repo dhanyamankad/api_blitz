@@ -73,6 +73,7 @@ export default async function AdminPage() {
           teams={teams as any}
           apis={apis}
           settings={settings}
+          adminEmail={session.user.email}
         />
       </main>
     </div>

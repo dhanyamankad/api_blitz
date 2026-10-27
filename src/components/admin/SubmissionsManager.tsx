@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Download, ExternalLink, CheckCircle2, Clock, Search, GitBranch, Video } from "lucide-react";
+import { ExportPdfButton } from "./ExportPdfButton";
 
 interface SubmissionData {
   githubUrl: string;
@@ -21,15 +22,25 @@ interface TeamData {
   id: string;
   name: string;
   status: string;
+  createdAt: Date | string;
   members: TeamMemberData[];
+  assignments?: {
+    api: {
+      id?: string;
+      name: string;
+      docsLink?: string;
+      setNumber?: number | null;
+    };
+  }[];
   submission: SubmissionData | null;
 }
 
 interface SubmissionsManagerProps {
   teams: TeamData[];
+  adminEmail?: string;
 }
 
-export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
+export function SubmissionsManager({ teams, adminEmail }: SubmissionsManagerProps) {
   const [filter, setFilter] = useState<"all" | "submitted" | "unsubmitted">("all");
   const [search, setSearch] = useState("");
 
@@ -150,13 +161,22 @@ export function SubmissionsManager({ teams }: SubmissionsManagerProps) {
             />
           </div>
 
-          <button
-            onClick={exportCSV}
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3.5 py-2 sm:py-1.5 text-xs font-mono font-semibold text-white transition-colors shrink-0"
-          >
-            <Download className="h-3.5 w-3.5 text-sky-400" />
-            <span>Export CSV</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={exportCSV}
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 text-xs font-mono font-semibold text-white transition-colors"
+              title="Download CSV spreadsheet"
+            >
+              <Download className="h-3.5 w-3.5 text-sky-400" />
+              <span>CSV</span>
+            </button>
+
+            <ExportPdfButton
+              teams={teams}
+              adminEmail={adminEmail}
+              variant="compact"
+            />
+          </div>
         </div>
       </div>
 
