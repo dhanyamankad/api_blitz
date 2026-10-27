@@ -68,7 +68,7 @@ export async function rejectTeamAction(teamId: string): Promise<AdminActionState
 
 /**
  * Auto-assign pre-defined Sets (5 APIs each) across all approved teams that need APIs.
- * Automatically distributes available and least-used sets.
+ * Automatically distributes available and least-used sets in a single atomic batch transaction.
  */
 export async function autoAssignApisAction(): Promise<AdminActionState> {
   await verifyAdmin();
@@ -94,6 +94,8 @@ export async function autoAssignApisAction(): Promise<AdminActionState> {
       };
     }
 
+    const teamIdsNeedingApis = new Set(teamsNeedingApis.map((t) => t.id));
+
     // Group APIs by setNumber
     const setsMap = new Map<number, typeof allApis>();
     for (const api of allApis) {
@@ -102,30 +104,68 @@ export async function autoAssignApisAction(): Promise<AdminActionState> {
       setsMap.get(sNum)!.push(api);
     }
 
-    const setStats = Array.from(setsMap.entries()).map(([setNum, apis]) => {
-      const assignmentCount = apis.reduce((acc, a) => acc + a.assignments.length, 0);
-      return { setNum, apis, count: assignmentCount };
-    });
+    // Filter sets that have at least 5 APIs
+    const validSets = Array.from(setsMap.entries())
+      .filter(([_, apis]) => apis.length >= 5)
+      .map(([setNum, apis]) => {
+        // Count existing assignments from already-allotted teams (excluding the teams we are about to re-assign)
+        const assignmentCount = apis.reduce(
+          (acc, a) =>
+            acc +
+            a.assignments.filter((asg) => !teamIdsNeedingApis.has(asg.teamId)).length,
+          0
+        );
+        return { setNum, apis: apis.slice(0, 5), count: assignmentCount };
+      });
 
-    await prisma.$transaction(async (tx) => {
-      for (const team of teamsNeedingApis) {
-        await tx.apiAssignment.deleteMany({ where: { teamId: team.id } });
+    if (validSets.length === 0) {
+      return {
+        error:
+          "No valid API sets with 5 APIs found. Please add APIs or sync from docs/apis.json.",
+      };
+    }
 
-        // Sort by lowest assignment count with random tiebreaker
-        setStats.sort((a, b) => {
-          if (a.count === b.count) return Math.random() - 0.5;
-          return a.count - b.count;
+    // Pre-calculate all assignments in memory so we do not loop database queries
+    const newAssignments: { teamId: string; apiId: string }[] = [];
+    const teamIdsToUpdate = teamsNeedingApis.map((t) => t.id);
+
+    for (const team of teamsNeedingApis) {
+      // Sort by lowest assignment count with random tiebreaker
+      validSets.sort((a, b) => {
+        if (a.count === b.count) return Math.random() - 0.5;
+        return a.count - b.count;
+      });
+
+      const chosen = validSets[0];
+      for (const api of chosen.apis) {
+        newAssignments.push({
+          teamId: team.id,
+          apiId: api.id,
         });
-
-        const chosen = setStats[0];
-        await tx.apiAssignment.createMany({
-          data: chosen.apis.map((a) => ({ teamId: team.id, apiId: a.id })),
-        });
-
-        // Increment count so subsequent teams get distinct sets
-        chosen.count += chosen.apis.length;
       }
-    });
+
+      // Increment count so subsequent teams get distinct/balanced sets
+      chosen.count += chosen.apis.length;
+    }
+
+    // Execute deletion and creation in a single fast atomic batch transaction
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.apiAssignment.deleteMany({
+          where: { teamId: { in: teamIdsToUpdate } },
+        });
+
+        if (newAssignments.length > 0) {
+          await tx.apiAssignment.createMany({
+            data: newAssignments,
+          });
+        }
+      },
+      {
+        maxWait: 10000,
+        timeout: 30000,
+      }
+    );
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
@@ -152,12 +192,18 @@ export async function manualAssignApisAction(
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
-      await tx.apiAssignment.deleteMany({ where: { teamId } });
-      await tx.apiAssignment.createMany({
-        data: apiIds.map((apiId) => ({ teamId, apiId })),
-      });
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.apiAssignment.deleteMany({ where: { teamId } });
+        await tx.apiAssignment.createMany({
+          data: apiIds.map((apiId) => ({ teamId, apiId })),
+        });
+      },
+      {
+        maxWait: 10000,
+        timeout: 20000,
+      }
+    );
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
@@ -232,18 +278,24 @@ export async function allotSetToTeamAction(
       return { error: `No APIs found in Set ${setNumber}.` };
     }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.apiAssignment.deleteMany({ where: { teamId } });
-      await tx.apiAssignment.createMany({
-        data: setApis.map((a) => ({ teamId, apiId: a.id })),
-      });
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.apiAssignment.deleteMany({ where: { teamId } });
+        await tx.apiAssignment.createMany({
+          data: setApis.slice(0, 5).map((a) => ({ teamId, apiId: a.id })),
+        });
+      },
+      {
+        maxWait: 10000,
+        timeout: 20000,
+      }
+    );
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
     return {
       success: true,
-      message: `Set ${setNumber} (${setApis.length} APIs) allotted to squad successfully!`,
+      message: `Set ${setNumber} (${Math.min(setApis.length, 5)} APIs) allotted to squad successfully!`,
     };
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Failed to allot Set to squad." };
@@ -275,11 +327,21 @@ export async function autoAssignTeamApisAction(teamId: string): Promise<AdminAct
       setsMap.get(sNum)!.push(api);
     }
 
-    // Determine usage of each set
-    const setStats = Array.from(setsMap.entries()).map(([setNum, apis]) => {
-      const assignmentCount = apis.reduce((acc, a) => acc + a.assignments.length, 0);
-      return { setNum, apis, count: assignmentCount };
-    });
+    // Determine usage of each set, excluding this team's existing assignments
+    const setStats = Array.from(setsMap.entries())
+      .filter(([_, apis]) => apis.length >= 5)
+      .map(([setNum, apis]) => {
+        const assignmentCount = apis.reduce(
+          (acc, a) =>
+            acc + a.assignments.filter((asg) => asg.teamId !== teamId).length,
+          0
+        );
+        return { setNum, apis: apis.slice(0, 5), count: assignmentCount };
+      });
+
+    if (setStats.length === 0) {
+      return { error: "No valid API sets with at least 5 APIs available." };
+    }
 
     // Sort by lowest assignment count + random tiebreak
     setStats.sort((a, b) => {
@@ -288,16 +350,19 @@ export async function autoAssignTeamApisAction(teamId: string): Promise<AdminAct
     });
 
     const chosen = setStats[0];
-    if (!chosen || chosen.apis.length === 0) {
-      return { error: "No API sets available." };
-    }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.apiAssignment.deleteMany({ where: { teamId } });
-      await tx.apiAssignment.createMany({
-        data: chosen.apis.map((a) => ({ teamId, apiId: a.id })),
-      });
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.apiAssignment.deleteMany({ where: { teamId } });
+        await tx.apiAssignment.createMany({
+          data: chosen.apis.map((a) => ({ teamId, apiId: a.id })),
+        });
+      },
+      {
+        maxWait: 10000,
+        timeout: 20000,
+      }
+    );
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
@@ -323,31 +388,37 @@ export async function syncApisFromJsonAction(): Promise<AdminActionState> {
     }
 
     const sets = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-    let inserted = 0;
+    const apiRecords: { name: string; docsLink: string; setNumber: number }[] = [];
 
-    await prisma.$transaction(async (tx) => {
-      await tx.apiAssignment.deleteMany();
-      await tx.api.deleteMany();
-
-      for (const s of sets) {
-        for (const a of s.apis) {
-          await tx.api.create({
-            data: {
-              name: a.name,
-              docsLink: a.docsLink,
-              setNumber: s.setNumber,
-            },
-          });
-          inserted++;
-        }
+    for (const s of sets) {
+      for (const a of s.apis) {
+        apiRecords.push({
+          name: a.name,
+          docsLink: a.docsLink,
+          setNumber: s.setNumber,
+        });
       }
-    });
+    }
+
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.apiAssignment.deleteMany();
+        await tx.api.deleteMany();
+        await tx.api.createMany({
+          data: apiRecords,
+        });
+      },
+      {
+        maxWait: 10000,
+        timeout: 30000,
+      }
+    );
 
     revalidatePath("/admin");
     revalidatePath("/dashboard");
     return {
       success: true,
-      message: `Synced ${inserted} APIs across ${sets.length} sets from docs/apis.json into database!`,
+      message: `Synced ${apiRecords.length} APIs across ${sets.length} sets from docs/apis.json into database!`,
     };
   } catch (err: unknown) {
     return { error: err instanceof Error ? err.message : "Failed to sync APIs from JSON." };
