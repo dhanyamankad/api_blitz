@@ -124,7 +124,7 @@ export default async function RulebookPage() {
                 <strong className="text-white">Random Balanced Distribution:</strong> Each approved squad is allotted exactly 5 APIs drawn randomly with balance constraints to maximize project diversity across campus.
               </li>
               <li>
-                <strong className="text-white">Kickoff Reveal Moment:</strong> The 5 APIs are strictly encrypted and hidden from participants until the kickoff countdown reaches zero on <span className="text-sky-300 font-bold">27 October 2026, 7:00 PM IST</span>.
+                <strong className="text-white">Kickoff Reveal Moment:</strong> The 5 APIs are strictly encrypted and hidden from participants until the kickoff countdown reaches zero on <span className="text-sky-300 font-bold">27 October 2026, 7:30 PM IST</span>.
               </li>
               <li>
                 <strong className="text-white">Integration Requirement:</strong> Teams are required to meaningfully integrate at least two (and ideally more) of their allotted APIs into their submitted application.
@@ -147,7 +147,7 @@ export default async function RulebookPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
               <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 sm:p-4">
                 <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">Sprint Kickoff</span>
-                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">27 Oct 2026 · 7:00 PM IST</h4>
+                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">27 Oct 2026 · 7:30 PM IST</h4>
                 <p className="text-[11px] font-mono text-slate-400 mt-1 leading-relaxed">
                   APIs revealed on team dashboards. Repository creation and sprint begins immediately.
                 </p>

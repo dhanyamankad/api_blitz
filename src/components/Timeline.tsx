@@ -12,7 +12,7 @@ export function Timeline() {
       icon: CheckCircle2,
     },
     {
-      time: "27 OCT 2026 · 19:00 IST · CEP 102",
+      time: "27 OCT 2026 · 19:30 IST · CEP 102",
       title: "API Reveal & Kickoff",
       desc: "Assemble offline at CEP 102! As countdown hits zero, dashboards unlock each team's 5 assigned APIs with official documentation links.",
       status: "upcoming",

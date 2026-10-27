@@ -196,7 +196,7 @@ export function ApprovedDashboard({
               CEP 102 <span className="text-slate-400 text-xs font-normal">· Dhirubhai Ambani University</span>
             </h3>
             <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-              All team members must report in-person to <b className="text-white">CEP 102</b> before the 7:00 PM kickoff. Bring your laptops, chargers, and student ID cards.
+              All team members must report in-person to <b className="text-white">CEP 102</b> before the 7:30 PM kickoff. Bring your laptops, chargers, and student ID cards.
             </p>
           </div>
         </div>
@@ -205,7 +205,7 @@ export function ApprovedDashboard({
           <span className="text-[10px] font-mono text-slate-400 uppercase">Kickoff Time</span>
           <span className="text-xs font-mono font-bold text-sky-400 flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5" />
-            <span>Today · 7:00 PM IST</span>
+            <span>Today · 7:30 PM IST</span>
           </span>
         </div>
       </div>

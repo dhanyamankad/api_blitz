@@ -91,7 +91,7 @@ export function Countdown({ targetDate, phase }: CountdownProps) {
                     minute: "2-digit",
                     timeZoneName: "short",
                   })
-                : "27 OCT 2026 · 19:00 IST"}
+                : "27 OCT 2026 · 19:30 IST"}
             </span>
           </div>
         </div>

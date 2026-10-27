@@ -50,7 +50,7 @@ export function RegistrationsClosedScreen({
             </div>
             <div>
               <span className="text-slate-400 text-[11px] block">Kickoff Time:</span>
-              <span className="text-sky-400 font-semibold">Today · 7:00 PM IST</span>
+              <span className="text-sky-400 font-semibold">Today · 7:30 PM IST</span>
             </div>
           </div>
         </div>
