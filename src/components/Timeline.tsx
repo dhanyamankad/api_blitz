@@ -5,7 +5,7 @@ export function Timeline() {
     {
       time: "DEADLINE CONCLUDED",
       title: "Team Registration Window (Closed)",
-      desc: "Registrations are officially closed. 31 squads registered and locked in to compete at CEP 102.",
+      desc: "Registrations are officially closed. Registered squads are locked in to compete at CEP 102.",
       status: "completed",
       badge: "REGISTRATIONS CLOSED",
       badgeColor: "text-slate-400 border-slate-700 bg-slate-800/80",

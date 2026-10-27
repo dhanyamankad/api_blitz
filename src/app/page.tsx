@@ -73,7 +73,7 @@ export default async function Home() {
 
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 text-xs font-mono font-semibold text-amber-300 backdrop-blur-md">
                 <Lock className="h-3.5 w-3.5 text-amber-400" />
-                <span>REGISTRATIONS CLOSED (31 SQUADS)</span>
+                <span>REGISTRATIONS CLOSED</span>
               </div>
             </div>
 

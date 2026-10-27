@@ -28,7 +28,7 @@ export function RegistrationsClosedScreen({
         </h1>
 
         <p className="mt-3 text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-          The registration window for <span className="text-white font-semibold">API Blitz 2026</span> has now concluded. A total of <span className="text-sky-400 font-bold font-mono">31 squads</span> have been registered and confirmed for the sprint.
+          The registration window for <span className="text-white font-semibold">API Blitz 2026</span> has now concluded. All registered squads are confirmed and locked in for the sprint.
         </p>
 
         {/* Venue & Event Logistics Card */}
