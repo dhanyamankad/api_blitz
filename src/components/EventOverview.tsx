@@ -20,7 +20,7 @@ export function EventOverview({ rulebookUrl }: EventOverviewProps) {
       icon: Cpu,
       tag: "THE SURPRISE",
       title: "5 Secret APIs",
-      desc: "At exactly 7:30 PM on 27 October, each approved team receives 5 randomly allotted APIs from our curated 100-API vault.",
+      desc: "At exactly 8:00 PM on 27 October, each approved team receives 5 randomly allotted APIs from our curated 100-API vault.",
       color: "from-purple-500/20 to-indigo-500/10",
       border: "border-purple-500/30",
       accent: "text-purple-400",

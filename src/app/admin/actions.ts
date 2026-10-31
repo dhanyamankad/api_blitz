@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail } from "@/lib/validation";
+import { sendShortlistNotificationEmail } from "@/lib/email";
 
 /**
  * Verify caller is an authorized admin.
@@ -488,6 +489,9 @@ export async function updateSettingsAction(
   const registrationsLocked =
     formData.get("registrations_locked") === "true" ||
     formData.get("registrations_locked") === "on";
+  const shortlistPublished =
+    formData.get("shortlist_published") === "true" ||
+    formData.get("shortlist_published") === "on";
 
   const removeRulebookFile = formData.get("remove_rulebook_file") === "true";
   const rulebookFile = formData.get("rulebook_file") as File | null;
@@ -499,6 +503,7 @@ export async function updateSettingsAction(
     submissions_unlocked: submissionsUnlocked ? "true" : "false",
     apis_published: apisPublished ? "true" : "false",
     registrations_locked: registrationsLocked ? "true" : "false",
+    shortlist_published: shortlistPublished ? "true" : "false",
   };
 
   if (removeRulebookFile) {
@@ -611,3 +616,231 @@ export async function removeRulebookAction(): Promise<AdminActionState> {
     return { error: err instanceof Error ? err.message : "Failed to remove rulebook file." };
   }
 }
+
+/**
+ * Toggle shortlist status for an individual team.
+ */
+export async function toggleShortlistTeamAction(
+  teamId: string,
+  isShortlisted: boolean
+): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    await prisma.team.update({
+      where: { id: teamId },
+      data: { isShortlisted },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/showcase");
+    return {
+      success: true,
+      message: isShortlisted
+        ? "Squad marked as shortlisted for Top 7."
+        : "Squad removed from shortlist.",
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to update shortlist status." };
+  }
+}
+
+/**
+ * Bulk set the Top 7 shortlisted teams by IDs.
+ */
+export async function setTop7ShortlistAction(teamIds: string[]): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Un-shortlist all approved teams
+      await tx.team.updateMany({
+        data: { isShortlisted: false },
+      });
+
+      // Shortlist selected teams
+      if (teamIds.length > 0) {
+        await tx.team.updateMany({
+          where: { id: { in: teamIds } },
+          data: { isShortlisted: true },
+        });
+      }
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/showcase");
+    return {
+      success: true,
+      message: `Successfully updated shortlist with ${teamIds.length} squads.`,
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to set shortlist." };
+  }
+}
+
+/**
+ * Toggle whether the Top 7 shortlist results are published and visible to participants.
+ */
+export async function togglePublishShortlistAction(publish?: boolean): Promise<AdminActionState> {
+  await verifyAdmin();
+
+  try {
+    let nextValue: string;
+    if (typeof publish === "boolean") {
+      nextValue = publish ? "true" : "false";
+    } else {
+      const current = await prisma.setting.findUnique({
+        where: { key: "shortlist_published" },
+      });
+      nextValue = current?.value === "true" ? "false" : "true";
+    }
+
+    await prisma.setting.upsert({
+      where: { key: "shortlist_published" },
+      update: { value: nextValue },
+      create: { key: "shortlist_published", value: nextValue },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+    revalidatePath("/");
+    revalidatePath("/showcase");
+
+    return {
+      success: true,
+      message:
+        nextValue === "true"
+          ? "Top 7 Shortlist published! All participants can now see their shortlisted / not shortlisted status on their dashboards."
+          : "Shortlist unpublished / hidden from participant dashboards.",
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to update shortlist visibility." };
+  }
+}
+
+/**
+ * Sends notification emails to the group leaders of shortlisted squads.
+ * If teamIds is specified, only sends to those squads; otherwise sends to all currently shortlisted squads.
+ */
+export async function notifyShortlistedTeamsAction(
+  teamIds?: string[]
+): Promise<AdminActionState & { count?: number; failed?: number }> {
+  await verifyAdmin();
+
+  try {
+    const whereClause: any = {
+      isShortlisted: true,
+    };
+    if (teamIds && teamIds.length > 0) {
+      whereClause.id = { in: teamIds };
+    }
+
+    const shortlistedTeams = await prisma.team.findMany({
+      where: whereClause,
+      include: {
+        members: {
+          orderBy: { isLeader: "desc" },
+        },
+      },
+    });
+
+    if (shortlistedTeams.length === 0) {
+      return {
+        error: "No shortlisted teams found to notify. Please shortlist teams first.",
+      };
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+    const notifiedTeamIds: string[] = [];
+
+    for (const team of shortlistedTeams) {
+      const leader = team.members.find((m) => m.isLeader);
+      const partner = team.members.find((m) => !m.isLeader);
+
+      if (!leader || !leader.email) {
+        failCount++;
+        continue;
+      }
+
+      const delivered = await sendShortlistNotificationEmail({
+        teamName: team.name,
+        leaderName: leader.name || "Squad Leader",
+        leaderEmail: leader.email,
+        partnerName: partner?.name,
+        partnerEmail: partner?.email,
+      });
+
+      if (delivered) {
+        successCount++;
+        notifiedTeamIds.push(team.id);
+      } else {
+        failCount++;
+      }
+    }
+
+    if (notifiedTeamIds.length > 0) {
+      await prisma.team.updateMany({
+        where: { id: { in: notifiedTeamIds } },
+        data: { shortlistNotifiedAt: new Date() },
+      });
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      count: successCount,
+      failed: failCount,
+      message: `Delivered shortlist email notifications to ${successCount} squad leader(s)${
+        failCount > 0 ? ` (${failCount} failed)` : ""
+      }.`,
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to send notifications." };
+  }
+}
+
+/**
+ * Sends a test shortlist notification email to the admin or specified email address for verification.
+ */
+export async function sendTestShortlistEmailAction(
+  targetEmail?: string
+): Promise<AdminActionState> {
+  const admin = await verifyAdmin();
+  const recipient = (
+    targetEmail ||
+    admin.user.email ||
+    process.env.NOTIFICATION_EMAIL ||
+    "202501069@dau.ac.in"
+  ).trim();
+
+  try {
+    const success = await sendShortlistNotificationEmail({
+      teamName: "Apex Innovators (Test Preview)",
+      leaderName: "Squad Leader",
+      leaderEmail: recipient,
+      partnerName: "Partner",
+      partnerEmail: recipient.includes("@dau.ac.in") ? "mankad.dhanya@gmail.com" : undefined,
+      presentationDate: "Monday, 2 November 2026",
+      presentationTime: "8:00 PM IST",
+      presentationVenue: "CEP 105, Dhirubhai Ambani University",
+    });
+
+    if (!success) {
+      return { error: "Failed to dispatch test shortlist email. Check SMTP credentials." };
+    }
+
+    return {
+      success: true,
+      message: `Test shortlist notification email dispatched successfully to ${recipient}!`,
+    };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Failed to send test email." };
+  }
+}
+
+

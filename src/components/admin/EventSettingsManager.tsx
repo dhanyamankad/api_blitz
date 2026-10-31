@@ -35,6 +35,7 @@ interface EventSettingsManagerProps {
     submissionsUnlocked?: boolean;
     apisPublished?: boolean;
     registrationsLocked?: boolean;
+    shortlistPublished?: boolean;
   };
 }
 
@@ -182,11 +183,11 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
                 type="text"
                 name="event_start_at"
                 defaultValue={settings.eventStartAt ? settings.eventStartAt.toISOString() : ""}
-                placeholder="2026-10-27T13:30:00.000Z"
+                placeholder="2026-10-27T14:30:00.000Z"
                 className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono"
               />
               <span className="text-[10px] font-mono text-slate-400 block mt-1">
-                ISO timestamp (e.g. 2026-10-27T13:30:00.000Z for 7PM IST)
+                ISO timestamp (e.g. 2026-10-27T14:30:00.000Z for 8PM IST)
               </span>
             </div>
 
@@ -302,7 +303,7 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
                   </span>
                 </div>
                 <p className="text-[11px] font-mono text-slate-400 leading-relaxed max-w-xl">
-                  When locked, participants cannot submit and see a locked notice. Switch this on when organizers officially open repository & YouTube submissions during the sprint. (Submissions will always automatically hard-lock after 28 Oct 2:00 AM IST).
+                  When locked, participants cannot submit and see a locked notice. Switch this on when organizers officially open repository & YouTube submissions during the sprint. (Submissions will always automatically hard-lock after 28 Oct 10:00 AM IST).
                 </p>
               </div>
 
@@ -315,6 +316,43 @@ export function EventSettingsManager({ settings }: EventSettingsManagerProps) {
                   className="sr-only peer"
                 />
                 <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+          </div>
+
+          {/* Top 7 Shortlist Publication Toggle */}
+          <div className="rounded-xl border border-amber-500/30 bg-amber-950/10 p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-base">🏆</span>
+                  <span className="text-xs font-mono font-bold text-white tracking-wide uppercase">
+                    Top 7 Finalist Dashboard Announcement
+                  </span>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                      settings.shortlistPublished
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                        : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                    }`}
+                  >
+                    {settings.shortlistPublished ? "ANNOUNCEMENT LIVE" : "ANNOUNCEMENT HIDDEN"}
+                  </span>
+                </div>
+                <p className="text-[11px] font-mono text-slate-400 leading-relaxed max-w-xl">
+                  When enabled, participant dashboards will display their official shortlist status (Top 7 finalists will see their celebratory card and next round briefing; other squads will see their participation appreciation card).
+                </p>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  name="shortlist_published"
+                  value="true"
+                  defaultChecked={settings.shortlistPublished}
+                  className="sr-only peer"
+                />
+                <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
             </div>
           </div>

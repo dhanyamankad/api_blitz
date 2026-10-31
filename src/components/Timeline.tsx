@@ -12,7 +12,7 @@ export function Timeline() {
       icon: CheckCircle2,
     },
     {
-      time: "27 OCT 2026 · 19:30 IST · CEP 102",
+      time: "27 OCT 2026 · 20:00 IST · CEP 102",
       title: "API Reveal & Kickoff",
       desc: "Assemble offline at CEP 102! As countdown hits zero, dashboards unlock each team's 5 assigned APIs with official documentation links.",
       status: "upcoming",
@@ -21,9 +21,9 @@ export function Timeline() {
       icon: Clock,
     },
     {
-      time: "28 OCT 2026 · 02:00 IST",
+      time: "28 OCT 2026 · 10:00 IST",
       title: "Submission Deadline",
-      desc: "GitHub repository and YouTube demo video URL lock activates on the server at 2:00 AM. Your final pushed work is frozen for evaluation.",
+      desc: "GitHub repository and YouTube demo video URL lock activates on the server at 10:00 AM. Your final pushed work is frozen for evaluation.",
       status: "upcoming",
       badge: "SUBMISSION DEADLINE",
       badgeColor: "text-amber-400 border-amber-500/30 bg-amber-500/10",

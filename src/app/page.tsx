@@ -160,7 +160,7 @@ export default async function Home() {
               {[
                 {
                   q: "Where is the event taking place?",
-                  a: "The hackathon takes place offline on-campus at CEP 102, Dhirubhai Ambani University. All registered squads should report to CEP 102 before 7:30 PM with their laptops and chargers.",
+                  a: "The hackathon takes place offline on-campus at CEP 102, Dhirubhai Ambani University. All registered squads should report to CEP 102 before 8:00 PM with their laptops and chargers.",
                 },
                 {
                   q: "Who is eligible to participate?",
@@ -180,7 +180,7 @@ export default async function Home() {
                 },
                 {
                   q: "How and when are the 5 APIs revealed?",
-                  a: "The APIs are locked until the event start countdown hits zero (27 October 2026, 7:30 PM IST). At that exact second, your dashboard reveals your team's 5 assigned APIs with official documentation links.",
+                  a: "The APIs are locked until the event start countdown hits zero (27 October 2026, 8:00 PM IST). At that exact second, your dashboard reveals your team's 5 assigned APIs with official documentation links.",
                 },
                 {
                   q: "Can we modify our GitHub submission before the deadline?",

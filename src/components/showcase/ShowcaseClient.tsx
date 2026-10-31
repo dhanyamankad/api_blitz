@@ -240,7 +240,7 @@ export function ShowcaseClient({ teams, phase, eventStartIso }: ShowcaseClientPr
                       <div className="rounded-lg border border-slate-800/80 bg-slate-950/40 p-2.5 flex items-center gap-2 text-xs font-mono text-slate-400">
                         <Lock className="h-3.5 w-3.5 text-amber-400 shrink-0" />
                         <span className="text-[11px]">
-                          5 APIs encrypted until kickoff (27 Oct 7PM IST)
+                          5 APIs encrypted until kickoff (27 Oct 8PM IST)
                         </span>
                       </div>
                     )}

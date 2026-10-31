@@ -29,14 +29,17 @@ model User {
 }
 
 model Team {
-  id          String          @id @default(cuid())
-  name        String
-  nameLower   String          @unique // case-insensitive uniqueness
-  status      TeamStatus      @default(pending_approval)
-  createdAt   DateTime        @default(now())
-  members     TeamMember[]
-  assignments ApiAssignment[]
-  submission  Submission?
+  id                  String          @id @default(cuid())
+  name                String
+  nameLower           String          @unique // case-insensitive uniqueness
+  status              TeamStatus      @default(pending_approval)
+  createdAt           DateTime        @default(now())
+  isShortlisted       Boolean         @default(false)
+  shortlistRank       Int?
+  shortlistNotifiedAt DateTime?
+  members             TeamMember[]
+  assignments         ApiAssignment[]
+  submission          Submission?
 }
 
 // One row per person on a team. email is UNIQUE so nobody can be on two teams,

@@ -124,7 +124,7 @@ export default async function RulebookPage() {
                 <strong className="text-white">Random Balanced Distribution:</strong> Each approved squad is allotted exactly 5 APIs drawn randomly with balance constraints to maximize project diversity across campus.
               </li>
               <li>
-                <strong className="text-white">Kickoff Reveal Moment:</strong> The 5 APIs are strictly encrypted and hidden from participants until the kickoff countdown reaches zero on <span className="text-sky-300 font-bold">27 October 2026, 7:30 PM IST</span>.
+                <strong className="text-white">Kickoff Reveal Moment:</strong> The 5 APIs are strictly encrypted and hidden from participants until the kickoff countdown reaches zero on <span className="text-sky-300 font-bold">27 October 2026, 8:00 PM IST</span>.
               </li>
               <li>
                 <strong className="text-white">Integration Requirement:</strong> Teams are required to meaningfully integrate at least two (and ideally more) of their allotted APIs into their submitted application.
@@ -147,7 +147,7 @@ export default async function RulebookPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
               <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 sm:p-4">
                 <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">Sprint Kickoff</span>
-                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">27 Oct 2026 · 7:30 PM IST</h4>
+                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">27 Oct 2026 · 8:00 PM IST</h4>
                 <p className="text-[11px] font-mono text-slate-400 mt-1 leading-relaxed">
                   APIs revealed on team dashboards. Repository creation and sprint begins immediately.
                 </p>
@@ -155,9 +155,9 @@ export default async function RulebookPage() {
 
               <div className="rounded-xl border border-red-500/20 bg-red-950/10 p-3.5 sm:p-4">
                 <span className="text-[10px] font-mono text-red-400 font-bold uppercase">Hard Submission Deadline</span>
-                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">28 Oct 2026 · 2:00 AM IST</h4>
+                <h4 className="font-mono text-sm sm:text-base font-bold text-white mt-1">28 Oct 2026 · 10:00 AM IST</h4>
                 <p className="text-[11px] font-mono text-slate-400 mt-1 leading-relaxed">
-                  Server lock activates automatically. No submissions or URL changes accepted after 2:00 AM.
+                  Server lock activates automatically. No submissions or URL changes accepted after 10:00 AM.
                 </p>
               </div>
             </div>
@@ -184,7 +184,7 @@ export default async function RulebookPage() {
             </div>
 
             <p className="text-xs font-mono text-slate-400 leading-relaxed">
-              Every squad must submit their deliverables through their participant dashboard prior to the 2:00 AM deadline:
+              Every squad must submit their deliverables through their participant dashboard prior to the 10:00 AM deadline:
             </p>
 
             <div className="space-y-2.5 sm:space-y-3 text-xs font-mono">
@@ -193,7 +193,7 @@ export default async function RulebookPage() {
                 <div>
                   <h4 className="font-bold text-white">1. GitHub Repository URL</h4>
                   <p className="text-slate-400 mt-0.5 text-[11px] leading-relaxed">
-                    Must be a public repository containing working code, clean commit history showing progress during the 6-hour sprint window, and a detailed <code className="text-sky-300 bg-slate-900 px-1 py-0.5 rounded">README.md</code> explaining architecture and APIs used.
+                    Must be a public repository containing working code, clean commit history showing progress during the sprint window, and a detailed <code className="text-sky-300 bg-slate-900 px-1 py-0.5 rounded">README.md</code> explaining architecture and APIs used.
                   </p>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default async function RulebookPage() {
             <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3 sm:p-3.5 text-[11px] font-mono text-slate-400 flex items-start sm:items-center gap-2">
               <AlertCircle className="h-4 w-4 text-sky-400 shrink-0 mt-0.5 sm:mt-0" />
               <span>
-                Both squad members have equal access to update and resubmit the links on the dashboard anytime before 2:00 AM IST.
+                Both squad members have equal access to update and resubmit the links on the dashboard anytime before 10:00 AM IST.
               </span>
             </div>
           </section>

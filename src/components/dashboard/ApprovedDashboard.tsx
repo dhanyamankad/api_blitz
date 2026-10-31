@@ -17,6 +17,9 @@ import {
   Video,
   Zap,
   MapPin,
+  Trophy,
+  Sparkles,
+  Award,
 } from "lucide-react";
 
 interface ApiData {
@@ -37,6 +40,9 @@ interface ApprovedDashboardProps {
   team: {
     id: string;
     name: string;
+    isShortlisted?: boolean;
+    shortlistRank?: number | null;
+    shortlistNotifiedAt?: Date | string | null;
     members: TeamMemberData[];
     assignments: { api: ApiData }[];
     submission: {
@@ -52,6 +58,7 @@ interface ApprovedDashboardProps {
   phase: "before_start" | "live" | "ended";
   isSubmissionsOpen?: boolean;
   apisPublished?: boolean;
+  shortlistPublished?: boolean;
 }
 
 export function ApprovedDashboard({
@@ -62,6 +69,7 @@ export function ApprovedDashboard({
   phase,
   isSubmissionsOpen = false,
   apisPublished = false,
+  shortlistPublished = true,
 }: ApprovedDashboardProps) {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(
     submitGithubAction,
@@ -71,12 +79,23 @@ export function ApprovedDashboard({
   const hasSubmitted = !!team.submission;
   const isSubmissionLocked = !isSubmissionsOpen;
   const isApiLocked = !apisPublished;
+  const isShortlistActive = shortlistPublished;
+  const isShortlisted = !!team.isShortlisted;
 
   // Progress Steps calculation
   const steps = [
     { label: "REGISTERED", done: true },
     { label: "APPROVED", done: true },
     { label: "SUBMITTED", done: hasSubmitted },
+    {
+      label: isShortlistActive
+        ? isShortlisted
+          ? "TOP 7 SHORTLISTED"
+          : "NOT SHORTLISTED"
+        : "SHORTLIST PENDING",
+      done: isShortlistActive,
+      isShortlisted: isShortlisted && isShortlistActive,
+    },
   ];
 
   return (
@@ -94,10 +113,19 @@ export function ApprovedDashboard({
                 <Zap className="h-3.5 w-3.5" />
                 <span>6 HOUR SPRINT</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs font-mono font-medium text-rose-300">
-                <MapPin className="h-3.5 w-3.5 text-rose-400" />
-                <span>VENUE: CEP 102</span>
-              </span>
+              {isShortlistActive && (
+                isShortlisted ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-amber-500/20 px-3 py-1 text-xs font-mono font-bold text-amber-300">
+                    <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                    <span>TOP 7 FINALIST</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/80 px-3 py-1 text-xs font-mono font-medium text-slate-400">
+                    <Award className="h-3.5 w-3.5 text-slate-400" />
+                    <span>NOT SHORTLISTED</span>
+                  </span>
+                )
+              )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               {team.name}
@@ -115,24 +143,28 @@ export function ApprovedDashboard({
           </div>
         </div>
 
-        {/* 3-Step Progress Tracker */}
+        {/* 4-Step Progress Tracker */}
         <div className="mt-6">
           <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-3">
             EVENT PROGRESS TRACKER
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-3">
             {steps.map((st, i) => (
               <div
                 key={i}
                 className={`rounded-xl border p-3 flex items-center gap-2.5 ${
-                  st.done
+                  st.isShortlisted
+                    ? "border-amber-500/40 bg-amber-950/20 text-amber-300 shadow-sm"
+                    : st.done
                     ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-300"
                     : "border-slate-800 bg-slate-950/50 text-slate-500"
                 }`}
               >
                 <div
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                    st.done
+                    st.isShortlisted
+                      ? "bg-amber-500 text-slate-950"
+                      : st.done
                       ? "bg-emerald-500 text-slate-950"
                       : "bg-slate-800 text-slate-400"
                   }`}
@@ -163,10 +195,10 @@ export function ApprovedDashboard({
                   <div className="text-xs font-mono text-slate-400 truncate">{m.email}</div>
                 </div>
                 <span
-                  className={`rounded px-2 py-0.5 text-[10px] font-mono font-medium ${
+                  className={`rounded px-2 py-0.5 text-[10px] font-mono font-bold uppercase shrink-0 ${
                     m.isLeader
-                      ? "bg-sky-500/10 border border-sky-500/20 text-sky-400"
-                      : "bg-slate-800 text-slate-300"
+                      ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                      : "bg-slate-800 text-slate-400"
                   }`}
                 >
                   {m.isLeader ? "Leader" : "Member"}
@@ -176,6 +208,129 @@ export function ApprovedDashboard({
           </div>
         </div>
       </div>
+
+      {/* Top 7 Shortlist Status Announcement Card */}
+      {isShortlistActive ? (
+        isShortlisted ? (
+          <div className="relative overflow-hidden rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-950/40 via-slate-900/90 to-emerald-950/30 p-5 sm:p-8 backdrop-blur-md shadow-2xl">
+            {/* Ambient lighting */}
+            <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+
+            <div className="relative flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-amber-500/20 px-3.5 py-1 text-xs font-mono font-bold text-amber-300 shadow-lg shadow-amber-500/10 animate-pulse">
+                    <Trophy className="h-4 w-4 text-amber-400" />
+                    <span>TOP 7 FINALIST</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-1 text-[11px] font-mono font-bold text-emerald-300">
+                    <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>QUALIFIED FOR NEXT ROUND</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
+                    Congratulations, {team.name}!
+                  </h2>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed font-mono">
+                    Your squad has been officially evaluated and <strong className="text-amber-300 font-bold">SHORTLISTED in the Top 7 Finalists</strong> of API Blitz 2026! Out of all competing squads across campus, your technical execution, architecture, and secret API integrations earned you a place in the Grand Finale.
+                  </p>
+                </div>
+
+                {/* Presentation guidelines */}
+                <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/80 p-4 font-mono text-xs space-y-2.5">
+                  <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Award className="h-4 w-4" />
+                    <span>Next Round: Grand Finale &amp; Live Jury Presentations</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300 text-[11px]">
+                    <div><strong className="text-slate-400">Date:</strong> Monday, 2 November 2026</div>
+                    <div><strong className="text-slate-400">Time:</strong> 8:00 PM IST (Report by 7:45 PM)</div>
+                    <div><strong className="text-slate-400">Venue:</strong> CEP 105 · Dhirubhai Ambani University</div>
+                    <div><strong className="text-slate-400">Format:</strong> 5–7 min Live Demo + 3 min Q&amp;A</div>
+                  </div>
+                  <div className="border-t border-slate-800/80 pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] text-slate-400">
+                    <span>Present your working app live &amp; explain your secret API integrations.</span>
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>Official briefing dispatched to squad leader</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex md:flex-col items-center md:items-end justify-between md:justify-start gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
+                <div className="text-left md:text-right">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Shortlist Result</span>
+                  <span className="text-base font-mono font-black text-emerald-400 flex items-center gap-1.5 md:justify-end mt-0.5">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span>SHORTLISTED</span>
+                  </span>
+                </div>
+                <div className="text-left md:text-right">
+                  <span className="inline-block rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-bold px-3 py-1.5">
+                    Podium Contender
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-7 backdrop-blur-md shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="space-y-2.5 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/90 px-3 py-1 text-xs font-mono font-medium text-slate-300">
+                    <Award className="h-3.5 w-3.5 text-slate-400" />
+                    <span>STATUS: NOT SHORTLISTED</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-0.5 text-[11px] font-mono text-sky-400">
+                    <span>PARTICIPATION HONORED</span>
+                  </span>
+                </div>
+
+                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight font-mono">
+                  Thank You for Competing in API Blitz 2026!
+                </h2>
+
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-mono">
+                  The jury has finalized scoring across all submissions and selected the Top 7 finalist squads for the live presentation round. While <strong className="text-white">{team.name}</strong> was not shortlisted among the Top 7, we congratulate both hackers on tackling the sprint, building an end-to-end application, and pushing your technical limits.
+                </p>
+
+                <p className="text-[11px] text-slate-400 font-mono pt-1">
+                  Certificates of Participation will be issued to all registered team members who submitted their project. Keep building and innovating!
+                </p>
+              </div>
+
+              <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Top 7 Status</span>
+                <span className="text-xs font-mono font-bold text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">
+                  Not Shortlisted
+                </span>
+              </div>
+            </div>
+          </div>
+        )
+      ) : (
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-4 sm:p-5 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3 font-mono">
+            <div className="flex items-center gap-2.5">
+              <Clock className="h-4 w-4 text-sky-400 shrink-0" />
+              <div>
+                <span className="text-xs font-bold text-white">Top 7 Shortlist Evaluation</span>
+                <p className="text-[11px] text-slate-400">
+                  The jury is reviewing all code repositories and project demos. Top 7 finalist results will be announced here soon.
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] uppercase tracking-wider text-sky-400/80 bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-full shrink-0">
+              In Review
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Venue & Event Logistics Banner */}
       <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-r from-rose-950/20 via-slate-900/60 to-slate-900/80 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg backdrop-blur-md">
@@ -196,7 +351,7 @@ export function ApprovedDashboard({
               CEP 102 <span className="text-slate-400 text-xs font-normal">· Dhirubhai Ambani University</span>
             </h3>
             <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-              All team members must report in-person to <b className="text-white">CEP 102</b> before the 7:30 PM kickoff. Bring your laptops, chargers, and student ID cards.
+              All team members must report in-person to <b className="text-white">CEP 102</b> before the 8:00 PM kickoff. Bring your laptops, chargers, and student ID cards.
             </p>
           </div>
         </div>
@@ -205,7 +360,7 @@ export function ApprovedDashboard({
           <span className="text-[10px] font-mono text-slate-400 uppercase">Kickoff Time</span>
           <span className="text-xs font-mono font-bold text-sky-400 flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5" />
-            <span>Today · 7:30 PM IST</span>
+            <span>Today · 8:00 PM IST</span>
           </span>
         </div>
       </div>
@@ -441,8 +596,8 @@ export function ApprovedDashboard({
             </div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
               {phase === "ended"
-                ? "The submission deadline has passed (28 Oct 2026, 2:00 AM IST). Submissions are permanently locked for evaluation."
-                : "Project submissions are currently locked. Organizers will unlock repository & video submissions during the sprint window. Submissions will close on 28th October 2026 at 02:00 AM IST. Prepare your GitHub repository and YouTube demo video in the meantime."}
+                ? "The submission deadline has passed (28 Oct 2026, 10:00 AM IST). Submissions are permanently locked for evaluation."
+                : "Project submissions are currently locked. Organizers will unlock repository & video submissions during the sprint window. Submissions will close on 28th October 2026 at 10:00 AM IST. Prepare your GitHub repository and YouTube demo video in the meantime."}
             </p>
           </div>
         )}

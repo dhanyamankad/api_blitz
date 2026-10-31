@@ -14,6 +14,7 @@ export type EventSettings = {
   submissionsUnlocked: boolean;
   apisPublished: boolean;
   registrationsLocked: boolean;
+  shortlistPublished: boolean;
 };
 
 const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : null);
@@ -45,6 +46,7 @@ export const getSettings = cache(async (): Promise<EventSettings> => {
     submissionsUnlocked: map.submissions_unlocked === "true",
     apisPublished: map.apis_published === "true",
     registrationsLocked: map.registrations_locked !== "false", // locked by default as deadline is over
+    shortlistPublished: map.shortlist_published === "true",
   };
 });
 
@@ -79,6 +81,11 @@ export function areSubmissionsOpen(s: EventSettings): boolean {
 /** APIs are revealed on participant dashboards only once published by organizers. */
 export function areApisPublished(s: EventSettings): boolean {
   return s.apisPublished;
+}
+
+/** Whether the Top 7 Shortlist results have been published to participant dashboards. */
+export function isShortlistPublished(s: EventSettings): boolean {
+  return s.shortlistPublished;
 }
 
 export function daysUntil(target: Date | null, s: EventSettings): number | null {

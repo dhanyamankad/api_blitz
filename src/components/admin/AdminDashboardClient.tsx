@@ -54,6 +54,9 @@ interface TeamData {
   members: TeamMemberData[];
   assignments: ApiAssignmentData[];
   submission: SubmissionData | null;
+  isShortlisted?: boolean;
+  shortlistRank?: number | null;
+  shortlistNotifiedAt?: Date | string | null;
 }
 
 interface ApiData {
@@ -80,6 +83,7 @@ interface AdminDashboardClientProps {
     submissionsUnlocked?: boolean;
     apisPublished?: boolean;
     registrationsLocked?: boolean;
+    shortlistPublished?: boolean;
   };
   adminEmail?: string;
 }
@@ -312,7 +316,11 @@ export function AdminDashboardClient({ teams, apis, settings, adminEmail }: Admi
         )}
 
         {activeTab === "submissions" && (
-          <SubmissionsManager teams={teams} adminEmail={adminEmail} />
+          <SubmissionsManager
+            teams={teams}
+            adminEmail={adminEmail}
+            shortlistPublished={settings.shortlistPublished}
+          />
         )}
 
         {activeTab === "settings" && (
